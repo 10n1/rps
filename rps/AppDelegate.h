@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+void CNSLog(const char* format, ...);
+
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>

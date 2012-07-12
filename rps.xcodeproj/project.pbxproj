@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		277A363015AEA37B009A067D /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = 277A362F15AEA37B009A067D /* render.c */; };
 		27A0C16015ACDACD000BA591 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A0C15F15ACDACD000BA591 /* UIKit.framework */; };
 		27A0C16215ACDACD000BA591 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A0C16115ACDACD000BA591 /* Foundation.framework */; };
 		27A0C16415ACDACD000BA591 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A0C16315ACDACD000BA591 /* CoreGraphics.framework */; };
@@ -23,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		277A362D15AEA244009A067D /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
+		277A362F15AEA37B009A067D /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
 		27A0C15B15ACDACD000BA591 /* rps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rps.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A0C15F15ACDACD000BA591 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		27A0C16115ACDACD000BA591 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -32,7 +35,6 @@
 		27A0C16B15ACDACD000BA591 /* rps-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "rps-Info.plist"; sourceTree = "<group>"; };
 		27A0C16D15ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		27A0C16F15ACDACD000BA591 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		27A0C17115ACDACD000BA591 /* rps-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "rps-Prefix.pch"; sourceTree = "<group>"; };
 		27A0C17215ACDACD000BA591 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		27A0C17315ACDACD000BA591 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		27A0C17515ACDACD000BA591 /* Shader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
@@ -93,12 +95,14 @@
 			children = (
 				27A0C17215ACDACD000BA591 /* AppDelegate.h */,
 				27A0C17315ACDACD000BA591 /* AppDelegate.m */,
+				277A362F15AEA37B009A067D /* render.c */,
+				277A362D15AEA244009A067D /* render.h */,
 				27A0C17515ACDACD000BA591 /* Shader.fsh */,
 				27A0C17715ACDACD000BA591 /* Shader.vsh */,
 				27A0C17915ACDACD000BA591 /* ViewController.h */,
 				27A0C17A15ACDACD000BA591 /* ViewController.m */,
-				27A0C17C15ACDACD000BA591 /* ViewController_iPhone.xib */,
 				27A0C17F15ACDACD000BA591 /* ViewController_iPad.xib */,
+				27A0C17C15ACDACD000BA591 /* ViewController_iPhone.xib */,
 				27A0C16A15ACDACD000BA591 /* Supporting Files */,
 			);
 			path = rps;
@@ -110,7 +114,6 @@
 				27A0C16B15ACDACD000BA591 /* rps-Info.plist */,
 				27A0C16C15ACDACD000BA591 /* InfoPlist.strings */,
 				27A0C16F15ACDACD000BA591 /* main.m */,
-				27A0C17115ACDACD000BA591 /* rps-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -183,6 +186,7 @@
 				27A0C17015ACDACD000BA591 /* main.m in Sources */,
 				27A0C17415ACDACD000BA591 /* AppDelegate.m in Sources */,
 				27A0C17B15ACDACD000BA591 /* ViewController.m in Sources */,
+				277A363015AEA37B009A067D /* render.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,7 +232,7 @@
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -270,7 +274,7 @@
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -298,8 +302,8 @@
 		27A0C18515ACDACD000BA591 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "rps/rps-Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "rps/rps-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -310,8 +314,8 @@
 		27A0C18615ACDACD000BA591 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "rps/rps-Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "rps/rps-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

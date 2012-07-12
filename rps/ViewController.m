@@ -69,6 +69,8 @@ vertex_t    gQuadVertexData[] =
 
 - (void)viewDidLoad
 {
+    GLKView *view = nil;
+    
     [super viewDidLoad];
     
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -77,7 +79,7 @@ vertex_t    gQuadVertexData[] =
         NSLog(@"Failed to create ES context");
     }
     
-    GLKView *view = (GLKView *)self.view;
+    view = (GLKView *)self.view;
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
@@ -244,6 +246,7 @@ vertex_t    gQuadVertexData[] =
 {
     GLint status;
     const GLchar *source;
+    GLint logLength;
     
     source = (GLchar *)[[NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:nil] UTF8String];
     if (!source) {
@@ -256,7 +259,6 @@ vertex_t    gQuadVertexData[] =
     glCompileShader(*shader);
     
 #if defined(DEBUG)
-    GLint logLength;
     glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
         GLchar *log = (GLchar *)malloc((size_t)logLength);
@@ -278,10 +280,10 @@ vertex_t    gQuadVertexData[] =
 - (BOOL)linkProgram:(GLuint)prog
 {
     GLint status;
+    GLint logLength;
     glLinkProgram(prog);
     
 #if defined(DEBUG)
-    GLint logLength;
     glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
         GLchar *log = (GLchar *)malloc((size_t)logLength);

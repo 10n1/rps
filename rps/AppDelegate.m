@@ -10,6 +10,21 @@
 
 #import "ViewController.h"
 
+#include <stdarg.h>
+
+void CNSLog(const char* format, ...)
+{
+
+    va_list args;
+    char message[1024] = {0};
+    va_start(args, format);
+    vprintf(format, args);
+    snprintf(message, sizeof(message), format, args);
+    va_end(args);
+    
+    NSLog(@"%s", message);
+}
+
 @implementation AppDelegate
 
 @synthesize window = _window;
