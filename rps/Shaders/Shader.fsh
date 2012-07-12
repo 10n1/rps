@@ -6,9 +6,12 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-varying lowp vec4 colorVarying;
+varying mediump vec2 texVarying;
+
+uniform sampler2D diffuseTexture;
 
 void main()
 {
-    gl_FragColor = colorVarying;
+    mediump vec4 color = texture2D(diffuseTexture, texVarying);
+    gl_FragColor = color;
 }

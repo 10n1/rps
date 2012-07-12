@@ -16,6 +16,7 @@ extern "C" { // Use C linkage
 
 enum {
     UNIFORM_MODELVIEWPROJECTION_MATRIX,
+    UNIFORM_TEXTURE,
     NUM_UNIFORMS
 };
 
@@ -26,6 +27,7 @@ typedef struct {
     GLint   uniforms[NUM_UNIFORMS];
     GLuint  vao;
     GLuint  quad_vertex_buffer;
+    GLuint  texture;
 } game_t;
 
 void game_initialize(game_t* game);

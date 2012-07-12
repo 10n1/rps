@@ -22,6 +22,7 @@ typedef struct {
 GLuint render_create_shader(GLenum type, const char* source);
 GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader,
                              const bind_location_t* binds, int num_binds);
+GLuint render_create_texture(const char* filename);
 
 #ifdef __cplusplus
 }

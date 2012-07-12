@@ -29,13 +29,13 @@ typedef struct {
 } vertex_t;
 static const vertex_t gQuadVertexData[] =
 {
-    -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, // TL
-     0.5f,  0.5f, 0.0f,     1.0f, 1.0f, // TR
-     0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // BR
+    -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
+     0.5f,  0.5f, 0.0f,     1.0f, 0.0f, // TR
+     0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
      
-    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, // BL
-     0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // BR
-    -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, // TL
+    -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, // BL
+     0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
+    -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
 };
 
 /*----------------------------------------------------------------------------*\
@@ -43,8 +43,7 @@ External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game) 
 {
-    char vertex_shader_source[1024];
-    char fragment_shader_source[1024];
+    char buffer[2048];
     GLuint vertex_shader;
     GLuint fragment_shader;
     bind_location_t binds[] = 
@@ -69,20 +68,28 @@ void game_initialize(game_t* game)
     glBindVertexArrayOES(0);
     
     /* Program */
-    if(system_load_file("Shader.vsh", vertex_shader_source, sizeof(vertex_shader_source))) {
+    if(system_load_file("Shader.vsh", buffer, sizeof(buffer))) {
         CNSLog("Vertex shader load failed!\n");
         return;
     }
-    if(system_load_file("Shader.fsh", fragment_shader_source, sizeof(fragment_shader_source))) {
+    vertex_shader = render_create_shader(GL_VERTEX_SHADER, buffer);
+    
+    if(system_load_file("Shader.fsh", buffer, sizeof(buffer))) {
         CNSLog("Fragment shader load failed!\n");
         return;
     }    
-    vertex_shader = render_create_shader(GL_VERTEX_SHADER, vertex_shader_source);
-    fragment_shader = render_create_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
+    fragment_shader = render_create_shader(GL_FRAGMENT_SHADER, buffer);
     game->program = render_create_program(vertex_shader, fragment_shader, binds, 2);
     
     /* Uniforms */
     game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(game->program, "modelViewProjectionMatrix");
+    game->uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(game->program, "diffuseTexture");
+    
+    /* GL setup */
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    game->texture = render_create_texture("r.png");
 }
 void game_update(game_t* game)
 {
@@ -95,4 +102,5 @@ void game_shutdown(game_t* game)
     glDeleteBuffers(1, &game->quad_vertex_buffer);
     glDeleteVertexArraysOES(1, &game->vao);
     glDeleteProgram(game->program);
+    glDeleteTextures(1, &game->texture);
 }

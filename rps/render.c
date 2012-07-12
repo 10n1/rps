@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 #include <stddef.h>
+#include "stb_image.h"
+#include "system.h"
 
 extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
@@ -120,4 +122,24 @@ GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader,
     glDeleteShader(fragment_shader);
     
     return program;
+}
+GLuint render_create_texture(const char* filename)
+{
+    GLuint texture;
+    int width;
+    int height;
+    int comp;
+    void* data;
+    
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    data = stbi_load(system_get_path(filename), &width, &height, &comp, 4);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    return texture;
 }

@@ -9,12 +9,12 @@
 attribute vec4 position;
 attribute vec2 tex;
 
-varying lowp vec4 colorVarying;
+varying mediump vec2 texVarying;
 
 uniform mat4 modelViewProjectionMatrix;
 
 void main()
 {
-    colorVarying = vec4(tex.s, tex.t, 1.0, 1.0);
+    texVarying = tex;
     gl_Position = modelViewProjectionMatrix * position;
 }

@@ -49,3 +49,17 @@ int system_load_file(const char* filename, void* buffer, int buffer_size)
     memcpy(buffer, [data bytes], data_length);
     return 0;
 }
+const char* system_get_path(const char* filename)
+{
+    char        file[128];
+    char        ext[16];
+    NSString*   file_string;
+    NSString*   ext_string;
+    NSString*   path_name;
+    
+    _split_filename(filename, file, ext);
+    file_string = [NSString stringWithCString:file encoding:NSUTF8StringEncoding];
+    ext_string = [NSString stringWithCString:ext encoding:NSUTF8StringEncoding];
+    path_name = [[NSBundle mainBundle] pathForResource:file_string ofType:ext_string];
+    return [path_name UTF8String];
+}

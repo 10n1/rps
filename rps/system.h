@@ -12,6 +12,7 @@ extern "C" { // Use C linkage
 #endif 
 
 int system_load_file(const char* filename, void* buffer, int buffer_size);
+const char* system_get_path(const char* filename);
 
 #ifdef __cplusplus
 }
