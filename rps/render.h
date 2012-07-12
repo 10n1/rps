@@ -7,13 +7,20 @@
 #ifndef _render_h__
 #define _render_h__
 
+#include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
 
 #ifdef __cplusplus
 extern "C" { // Use C linkage
 #endif
 
-GLuint compile_shader(GLenum type, const char* source);
+typedef struct {
+    uint32_t    index;
+    const char* name;
+} bind_location_t;
+
+GLuint render_create_shader(GLenum type, const char* source);
+GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader, const bind_location_t* binds);
 
 #ifdef __cplusplus
 }

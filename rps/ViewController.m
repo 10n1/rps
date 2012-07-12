@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#include "render.h"
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // Uniform index.
@@ -177,20 +179,25 @@ vertex_t    gQuadVertexData[] =
 {
     GLuint vertShader, fragShader;
     NSString *vertShaderPathname, *fragShaderPathname;
+    const char* source;
     
     // Create shader program.
     _program = glCreateProgram();
     
     // Create and compile vertex shader.
     vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
-    if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
+    source = (GLchar *)[[NSString stringWithContentsOfFile:vertShaderPathname encoding:NSUTF8StringEncoding error:nil] UTF8String];
+    vertShader = render_create_shader(GL_VERTEX_SHADER, source);
+    if (!vertShader) {
         NSLog(@"Failed to compile vertex shader");
         return NO;
     }
     
     // Create and compile fragment shader.
     fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
-    if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
+    source = (GLchar *)[[NSString stringWithContentsOfFile:fragShaderPathname encoding:NSUTF8StringEncoding error:nil] UTF8String];
+    fragShader = render_create_shader(GL_FRAGMENT_SHADER, source);
+    if (!fragShader) {
         NSLog(@"Failed to compile fragment shader");
         return NO;
     }
@@ -212,11 +219,9 @@ vertex_t    gQuadVertexData[] =
         
         if (vertShader) {
             glDeleteShader(vertShader);
-            vertShader = 0;
         }
         if (fragShader) {
             glDeleteShader(fragShader);
-            fragShader = 0;
         }
         if (_program) {
             glDeleteProgram(_program);
@@ -238,6 +243,8 @@ vertex_t    gQuadVertexData[] =
         glDetachShader(_program, fragShader);
         glDeleteShader(fragShader);
     }
+    
+    [self validateProgram:_program];
     
     return YES;
 }
