@@ -93,16 +93,17 @@ GLuint render_create_shader(GLenum type, const char* source)
     
     return shader;
 }
-GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader, const bind_location_t* binds)
+GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader, 
+                             const bind_location_t* binds, int num_binds)
 {
+    int ii;
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     
     /* Binding must be done pre-link. Not sure why */
-    while(binds && binds->name) {
-        glBindAttribLocation(program, binds->index, binds->name);
-        ++binds;
+    for(ii=0;ii<num_binds;++ii) {
+        glBindAttribLocation(program, binds[ii].index, binds[ii].name);
     }
     
     if(_link_program(program) || _validate_program(program)) {

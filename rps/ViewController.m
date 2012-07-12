@@ -41,7 +41,7 @@ vertex_t    gQuadVertexData[] =
      0.5f,  0.5f, 0.0f,     1.0f, 1.0f, // TR
      0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // BR
      
-    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f,
+    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, // BL
      0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // BR
     -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, // TL
 };
@@ -150,7 +150,10 @@ vertex_t    gQuadVertexData[] =
 
 - (void)update
 {
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+    float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
+    float width = 10.0f;
+    float height = width/aspect;
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
     
     _modelViewProjectionMatrix = projectionMatrix;
 }
@@ -161,8 +164,6 @@ vertex_t    gQuadVertexData[] =
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glBindVertexArrayOES(_vertexArray);
-    
-    // Render the object again with ES2
     glUseProgram(_program);
     
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
@@ -180,8 +181,7 @@ vertex_t    gQuadVertexData[] =
     bind_location_t binds[] = 
     {
         { ATTRIB_VERTEX, "position" },
-        { ATTRIB_TEXCOORD, "tex" },
-        { ATTRIB_NONE, NULL }
+        { ATTRIB_TEXCOORD, "tex" }
     };
     
     // Create and compile vertex shader.
@@ -202,7 +202,7 @@ vertex_t    gQuadVertexData[] =
         return NO;
     }
     
-    _program = render_create_program(vertShader, fragShader, binds);
+    _program = render_create_program(vertShader, fragShader, binds, sizeof(binds)/sizeof(binds[0]));
     
     // Get uniform locations.
     uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
