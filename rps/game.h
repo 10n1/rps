@@ -17,6 +17,7 @@ extern "C" { // Use C linkage
 enum {
     UNIFORM_MODELVIEWPROJECTION_MATRIX,
     UNIFORM_TEXTURE,
+    UNIFORM_COLOR,
     NUM_UNIFORMS
 };
 

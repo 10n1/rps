@@ -9,9 +9,10 @@
 varying mediump vec2 texVarying;
 
 uniform sampler2D diffuseTexture;
+uniform mediump vec4 color;
 
 void main()
 {
-    mediump vec4 color = texture2D(diffuseTexture, texVarying);
-    gl_FragColor = color;
+    mediump vec4 texColor = texture2D(diffuseTexture, texVarying);
+    gl_FragColor = color*texColor;
 }

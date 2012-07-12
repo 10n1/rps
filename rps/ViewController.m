@@ -98,7 +98,7 @@
 - (void)update
 {
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
-    float width = 3.0f;
+    float width = 0.98f;
     float height = width/aspect;
     GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
     
@@ -114,6 +114,7 @@
     glUseProgram(_game.program);
     
     glUniformMatrix4fv(_game.uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
+    glUniform4f(_game.uniforms[UNIFORM_COLOR], 0.85f, 0.65f, 0.45f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, _game.texture);
     
     glDrawArrays(GL_TRIANGLES, 0, 36);

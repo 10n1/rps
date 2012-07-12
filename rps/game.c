@@ -84,6 +84,7 @@ void game_initialize(game_t* game)
     /* Uniforms */
     game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(game->program, "modelViewProjectionMatrix");
     game->uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(game->program, "diffuseTexture");
+    game->uniforms[UNIFORM_COLOR] = glGetUniformLocation(game->program, "color");
     
     /* GL setup */
     glEnable(GL_TEXTURE_2D);
