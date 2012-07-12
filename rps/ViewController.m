@@ -9,15 +9,11 @@
 #import "ViewController.h"
 
 #include "render.h"
+#include "game.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // Uniform index.
-enum
-{
-    UNIFORM_MODELVIEWPROJECTION_MATRIX,
-    NUM_UNIFORMS
-};
 GLint uniforms[NUM_UNIFORMS];
 
 // Attribute index.
@@ -53,6 +49,7 @@ vertex_t    gQuadVertexData[] =
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
+    game_t _game;
 }
 @property (strong, nonatomic) EAGLContext *context;
 
@@ -83,6 +80,8 @@ vertex_t    gQuadVertexData[] =
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     [self setupGL];
+    
+    game_initialize(&_game);
 }
 
 - (void)viewDidUnload
@@ -151,7 +150,7 @@ vertex_t    gQuadVertexData[] =
 - (void)update
 {
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
-    float width = 10.0f;
+    float width = 3.0f;
     float height = width/aspect;
     GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
     
