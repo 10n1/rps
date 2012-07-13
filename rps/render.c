@@ -154,7 +154,9 @@ typedef struct {
 } vertex_t;
 void render_load_font(const char* filename)
 {
-    int ii;
+    float tex_width;
+    float tex_height;
+    int ii, jj;
     uint8_t header[4];
     const char* full_path = system_get_path(filename);
     FILE* file = fopen(full_path, "rb");
@@ -176,6 +178,8 @@ void render_load_font(const char* filename)
         case 2: {
                 bmfont_common_t block;
                 fread(&block, type.size, 1, file);
+                tex_width = (float)block.scaleW;
+                tex_height = (float)block.scaleH;
                 break;
             }
         case 3: {
@@ -199,12 +203,12 @@ void render_load_font(const char* filename)
     } while(!feof(file) && !ferror(file));
     
     for(ii=0;ii<256;++ii) {
-        vertex_t vertices[4] = 
+        vertex_t vertices[] = 
         {
             -0.5f,  0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y, // TL
              0.5f,  0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y, // TR
-             0.5f, -0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BR
-            -0.5f, -0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BL
+             0.5f, -0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BR
+            -0.5f, -0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BL
         };
         const uint16_t indices[] = 
         {
@@ -214,7 +218,13 @@ void render_load_font(const char* filename)
         GLuint buffers[2];
         if(_characters[ii].id == 0)
             continue;
-        
+        if(_characters[ii].id == 'A')
+            buffers[0] = 0;
+            
+        for(jj=0;jj<4; ++jj) {
+            vertices[jj].tex[0] /= tex_width;
+            vertices[jj].tex[1] /= tex_height;
+        }
         glGenVertexArraysOES(1, &_character_meshes[ii]);
         glBindVertexArrayOES(_character_meshes[ii]);
         
@@ -232,4 +242,9 @@ void render_load_font(const char* filename)
         glBindVertexArrayOES(0);
         
     }
+}
+void render_draw_letter(char letter)
+{
+    glBindVertexArrayOES(_character_meshes[letter]);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }

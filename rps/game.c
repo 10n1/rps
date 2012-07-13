@@ -96,7 +96,7 @@ void game_initialize(game_t* game)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    game->texture = render_create_texture("r.png");
+    game->texture = render_create_texture("font_0.png");
     
     /* Font */
     render_load_font("font.fnt");
@@ -116,13 +116,17 @@ void game_render(game_t* game)
     glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glBindVertexArrayOES(game->vao);
     glUseProgram(game->program);
     
-    glUniform4f(game->uniforms[UNIFORM_COLOR], 0.85f, 0.65f, 0.45f, 1.0f);
+    glUniform4f(game->uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, game->texture);
     
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    if(game) {
+        render_draw_letter('j');
+    } else {
+        glBindVertexArrayOES(game->vao);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    }
 }
 void game_shutdown(game_t* game)
 {
