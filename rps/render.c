@@ -263,6 +263,21 @@ void render_draw_letter(char letter, float x, float y)
     glBindVertexArrayOES(_character_meshes[letter]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
+void render_draw_string(const char* str, float x, float y, float scale)
+{
+    extern int uniform_loc;
+    while(*str != '\0') {
+        GLKMatrix4 mat = GLKMatrix4MakeTranslation(x, y, 0.0f);
+        mat.m00 = mat.m11 = mat.m22 = scale;
+        mat = GLKMatrix4Multiply(mat, _projectionMatrix);
+        
+        glUniformMatrix4fv(uniform_loc, 1, 0, mat.m);
+        glBindVertexArrayOES(_character_meshes[*str]);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+        x += 1;
+        ++str;
+    }
+}
 void render_resize(float width, float height)
 {
     _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);

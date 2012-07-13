@@ -127,6 +127,7 @@ void game_render(game_t* game)
     
     if(game) {
         render_draw_letter('@', 0.5f, 0);
+        render_draw_string("Hello", -0.5f, 0.0f, 1.0f);
     } else {
         glBindVertexArrayOES(game->vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
