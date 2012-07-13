@@ -41,6 +41,8 @@ static const uint16_t gQuadIndexData[] =
     3, 2, 0,
 };
 
+int uniform_loc = 0;
+
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
@@ -91,6 +93,7 @@ void game_initialize(game_t* game)
     game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(game->program, "modelViewProjectionMatrix");
     game->uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(game->program, "diffuseTexture");
     game->uniforms[UNIFORM_COLOR] = glGetUniformLocation(game->program, "color");
+    uniform_loc = game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX];
     
     /* GL setup */
     glEnable(GL_TEXTURE_2D);
@@ -105,8 +108,9 @@ void game_update(game_t* game, float width, float height)
 {
     GLKMatrix4 projectionMatrix;
     float aspect = fabsf(width/height);
-    width = 1.0f;
+    width = 3.0f;
     height = width/aspect;
+    render_resize(width, height);
     projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
     
     glUniformMatrix4fv(game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, projectionMatrix.m);
@@ -122,7 +126,7 @@ void game_render(game_t* game)
     glBindTexture(GL_TEXTURE_2D, game->texture);
     
     if(game) {
-        render_draw_letter('@');
+        render_draw_letter('@', 0.5f, 0);
     } else {
         glBindVertexArrayOES(game->vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);

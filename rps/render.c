@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <GLKit/GLKMath.h>
 #include "stb_image.h"
 #include "system.h"
 
@@ -62,6 +63,7 @@ static int _validate_program(GLuint program)
 }
 static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
+static GLKMatrix4       _projectionMatrix;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -224,6 +226,8 @@ void render_load_font(const char* filename)
             continue;
             
         for(jj=0;jj<4; ++jj) {
+            vertices[jj].pos[0] /= char_height;
+            vertices[jj].pos[1] /= char_height;
             vertices[jj].tex[0] /= tex_width;
             vertices[jj].tex[1] /= tex_height;
         }
@@ -245,8 +249,21 @@ void render_load_font(const char* filename)
         
     }
 }
-void render_draw_letter(char letter)
+void render_draw_letter(char letter, float x, float y)
 {
+    extern int uniform_loc;
+    GLKMatrix4 model = GLKMatrix4Identity;
+    model.m[12] = x;
+    model.m[13] = y;
+    
+    model = GLKMatrix4Multiply(model, _projectionMatrix);
+    //model = GLKMatrix4Multiply(_projectionMatrix, model);
+    
+    glUniformMatrix4fv(uniform_loc, 1, 0, model.m);
     glBindVertexArrayOES(_character_meshes[letter]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+}
+void render_resize(float width, float height)
+{
+    _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
 }

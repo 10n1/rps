@@ -23,7 +23,8 @@ GLuint render_create_shader(GLenum type, const char* source);
 GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader,
                              const bind_location_t* binds, int num_binds);
 GLuint render_create_texture(const char* filename);
-void render_draw_letter(char letter);
+void render_draw_letter(char letter, float x, float y);
+void render_resize(float width, float height);
 
 void render_load_font(const char* filename);
 
