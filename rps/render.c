@@ -156,6 +156,7 @@ void render_load_font(const char* filename)
 {
     float tex_width;
     float tex_height;
+    float char_height;
     int ii, jj;
     uint8_t header[4];
     const char* full_path = system_get_path(filename);
@@ -180,6 +181,7 @@ void render_load_font(const char* filename)
                 fread(&block, type.size, 1, file);
                 tex_width = (float)block.scaleW;
                 tex_height = (float)block.scaleH;
+                char_height = (float)block.base/tex_height;
                 break;
             }
         case 3: {
@@ -203,12 +205,14 @@ void render_load_font(const char* filename)
     } while(!feof(file) && !ferror(file));
     
     for(ii=0;ii<256;++ii) {
+        float yoffset = _characters[ii].yoffset/tex_height;
+        float width = _characters[ii].width/tex_width;
         vertex_t vertices[] = 
         {
-            -0.5f,  0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y, // TL
-             0.5f,  0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y, // TR
-             0.5f, -0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BR
-            -0.5f, -0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BL
+            -width/2,  char_height+yoffset, 0.0f,      _characters[ii].x,                       _characters[ii].y, // TL
+             width/2,  char_height+yoffset, 0.0f,      _characters[ii].x+_characters[ii].width, _characters[ii].y, // TR
+             width/2,  0.0f+yoffset, 0.0f,             _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BR
+            -width/2,  0.0f+yoffset, 0.0f,             _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BL
         };
         const uint16_t indices[] = 
         {
@@ -218,8 +222,6 @@ void render_load_font(const char* filename)
         GLuint buffers[2];
         if(_characters[ii].id == 0)
             continue;
-        if(_characters[ii].id == 'A')
-            buffers[0] = 0;
             
         for(jj=0;jj<4; ++jj) {
             vertices[jj].tex[0] /= tex_width;

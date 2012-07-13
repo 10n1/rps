@@ -122,7 +122,7 @@ void game_render(game_t* game)
     glBindTexture(GL_TEXTURE_2D, game->texture);
     
     if(game) {
-        render_draw_letter('j');
+        render_draw_letter('@');
     } else {
         glBindVertexArrayOES(game->vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
