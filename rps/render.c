@@ -65,9 +65,46 @@ static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
 static GLKMatrix4       _projectionMatrix;
 
+typedef struct {
+    float   pos[3];
+    float   tex[2];
+} vertex_t;
+static GLuint           _quad_mesh;
+
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
+void render_init(void)
+{
+    const vertex_t vertices[] =
+    {
+        -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
+         0.5f,  0.5f, 0.0f,     1.0f, 0.0f, // TR
+         0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
+        -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, // BL
+    };
+    const uint16_t indices[] = 
+    {
+        0, 1, 2,
+        3, 2, 0,
+    };
+    GLuint buffers[2] = {0};
+    glGenVertexArraysOES(1, &_quad_mesh);
+    glBindVertexArrayOES(_quad_mesh);
+    
+    glGenBuffers(2, buffers);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+    
+    glBindVertexArrayOES(0);
+}
 GLuint render_create_shader(GLenum type, const char* source)
 {   
     GLint status;
@@ -142,6 +179,10 @@ GLuint render_create_texture(const char* filename)
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     data = stbi_load(system_get_path(filename), &width, &height, &comp, 4);
+    if(data == NULL) {
+        CNSLog("Texture %s load failed", filename);
+        return 0;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     stbi_image_free(data);
     
@@ -149,11 +190,6 @@ GLuint render_create_texture(const char* filename)
     
     return texture;
 }
-
-typedef struct {
-    float   pos[3];
-    float   tex[2];
-} vertex_t;
 void render_load_font(const char* filename)
 {
     float tex_width;
@@ -277,6 +313,13 @@ void render_draw_string(const char* str, float x, float y, float scale)
         x += 1;
         ++str;
     }
+}
+void render_draw_fullscreen_quad(void)
+{
+    extern int uniform_loc;
+    glUniformMatrix4fv(uniform_loc, 1, 0, GLKMatrix4Identity.m);
+    glBindVertexArrayOES(_quad_mesh);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_resize(float width, float height)
 {

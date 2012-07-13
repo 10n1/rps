@@ -42,6 +42,7 @@ static const uint16_t gQuadIndexData[] =
 };
 
 int uniform_loc = 0;
+int grid;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -99,16 +100,17 @@ void game_initialize(game_t* game)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    game->texture = render_create_texture("font_0.png");
+    game->texture = render_create_texture("assets/font_0.png");
+    grid = render_create_texture("assets/grid.png");
     
     /* Font */
-    render_load_font("font.fnt");
+    render_load_font("assets/font.fnt");
 }
 void game_update(game_t* game, float width, float height)
 {
     GLKMatrix4 projectionMatrix;
     float aspect = fabsf(width/height);
-    width = 3.0f;
+    width = 1.0f;
     height = width/aspect;
     render_resize(width, height);
     projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
@@ -125,10 +127,11 @@ void game_render(game_t* game)
     glUniform4f(game->uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, game->texture);
     
-    if(game) {
+    if(game && 0) {
         render_draw_letter('@', 0.5f, 0);
         render_draw_string("Hello", -0.5f, 0.0f, 1.0f);
     } else {
+        glBindTexture(GL_TEXTURE_2D, grid);
         glBindVertexArrayOES(game->vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     }

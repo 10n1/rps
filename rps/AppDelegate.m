@@ -18,7 +18,6 @@ void CNSLog(const char* format, ...)
     va_list args;
     char message[1024] = {0};
     va_start(args, format);
-    vprintf(format, args);
     snprintf(message, sizeof(message), format, args);
     va_end(args);
     
