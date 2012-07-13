@@ -28,6 +28,7 @@ typedef struct {
     GLint   uniforms[NUM_UNIFORMS];
     GLuint  vao;
     GLuint  quad_vertex_buffer;
+    GLuint  quad_index_buffer;
     GLuint  texture;
 } game_t;
 

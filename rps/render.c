@@ -59,7 +59,8 @@ static int _validate_program(GLuint program)
     
     return 0;
 }
-static bmfont_char_t    _characters[256];
+static bmfont_char_t    _characters[256] = {0};
+static GLuint           _character_meshes[256] = {0};
 
 /*----------------------------------------------------------------------------*\
 External
@@ -145,8 +146,14 @@ GLuint render_create_texture(const char* filename)
     
     return texture;
 }
+
+typedef struct {
+    float   pos[3];
+    float   tex[2];
+} vertex_t;
 void render_load_font(const char* filename)
 {
+    int ii;
     uint8_t header[4];
     const char* full_path = system_get_path(filename);
     FILE* file = fopen(full_path, "rb");
@@ -163,18 +170,18 @@ void render_load_font(const char* filename)
         case 1: {
                 bmfont_info_t block;
                 fread(&block, type.size, 1, file);
+                break;
             }
-            break;
         case 2: {
                 bmfont_common_t block;
                 fread(&block, type.size, 1, file);
+                break;
             }
-            break;
         case 3: {
                 bmfont_info_t pages;
                 fread(&pages, type.size, 1, file);
+                break;
             }
-            break;
         case 4: {
                 int ii;
                 int num_chars = type.size/sizeof(bmfont_char_t);
@@ -183,10 +190,16 @@ void render_load_font(const char* filename)
                     fread(&character, sizeof(character), 1, file);
                     _characters[character.id] = character;
                 }
+                break;
             }
-            break;
         case 5:
             break;
         }
-    } while(!feof(file) && ferror(file));
+    } while(!feof(file) && !ferror(file));
+    
+    for(ii=0;ii<256;++ii) {
+        if(_characters[ii].id == 0)
+            continue;
+        
+    }
 }

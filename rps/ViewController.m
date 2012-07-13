@@ -117,7 +117,7 @@
     glUniform4f(_game.uniforms[UNIFORM_COLOR], 0.85f, 0.65f, 0.45f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, _game.texture);
     
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 
 @end

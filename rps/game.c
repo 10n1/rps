@@ -32,10 +32,12 @@ static const vertex_t gQuadVertexData[] =
     -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
      0.5f,  0.5f, 0.0f,     1.0f, 0.0f, // TR
      0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
-     
     -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, // BL
-     0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
-    -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
+};
+static const uint16_t gQuadIndexData[] = 
+{
+    0, 1, 2,
+    3, 2, 0,
 };
 
 /*----------------------------------------------------------------------------*\
@@ -59,6 +61,9 @@ void game_initialize(game_t* game)
     glGenBuffers(1, &game->quad_vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, game->quad_vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gQuadVertexData), gQuadVertexData, GL_STATIC_DRAW);
+    glGenBuffers(1, &game->quad_index_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, game->quad_index_buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gQuadIndexData), gQuadIndexData, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(ATTRIB_POSITION);
     glVertexAttribPointer(ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
