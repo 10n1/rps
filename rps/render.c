@@ -12,6 +12,7 @@
 #include "stb_image.h"
 #include "system.h"
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
@@ -198,8 +199,37 @@ void render_load_font(const char* filename)
     } while(!feof(file) && !ferror(file));
     
     for(ii=0;ii<256;++ii) {
+        vertex_t vertices[4] = 
+        {
+            -0.5f,  0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y, // TL
+             0.5f,  0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y, // TR
+             0.5f, -0.5f, 0.0f,     _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BR
+            -0.5f, -0.5f, 0.0f,     _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BL
+        };
+        const uint16_t indices[] = 
+        {
+            0, 1, 2,
+            3, 2, 0,
+        };
+        GLuint buffers[2];
         if(_characters[ii].id == 0)
             continue;
+        
+        glGenVertexArraysOES(1, &_character_meshes[ii]);
+        glBindVertexArrayOES(_character_meshes[ii]);
+        
+        glGenBuffers(2, buffers);
+        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+        
+        glBindVertexArrayOES(0);
         
     }
 }

@@ -7,6 +7,7 @@
 #include "game.h"
 
 #include <stddef.h>
+#include <GLKit/GLKMath.h>
 
 #include "system.h"
 #include "render.h"
@@ -100,11 +101,28 @@ void game_initialize(game_t* game)
     /* Font */
     render_load_font("font.fnt");
 }
-void game_update(game_t* game)
+void game_update(game_t* game, float width, float height)
 {
+    GLKMatrix4 projectionMatrix;
+    float aspect = fabsf(width/height);
+    width = 1.0f;
+    height = width/aspect;
+    projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
+    
+    glUniformMatrix4fv(game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, projectionMatrix.m);
 }
 void game_render(game_t* game)
 {
+    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glBindVertexArrayOES(game->vao);
+    glUseProgram(game->program);
+    
+    glUniform4f(game->uniforms[UNIFORM_COLOR], 0.85f, 0.65f, 0.45f, 1.0f);
+    glBindTexture(GL_TEXTURE_2D, game->texture);
+    
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void game_shutdown(game_t* game)
 {

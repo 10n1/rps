@@ -97,27 +97,14 @@
 
 - (void)update
 {
-    float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
-    float width = 0.98f;
-    float height = width/aspect;
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
-    
-    _modelViewProjectionMatrix = projectionMatrix;
+    float width = self.view.bounds.size.width;
+    float height = self.view.bounds.size.height;
+    game_update(&_game, width, height);
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glBindVertexArrayOES(_game.vao);
-    glUseProgram(_game.program);
-    
-    glUniformMatrix4fv(_game.uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    glUniform4f(_game.uniforms[UNIFORM_COLOR], 0.85f, 0.65f, 0.45f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, _game.texture);
-    
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    game_render(&_game);
 }
 
 @end
