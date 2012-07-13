@@ -6,6 +6,7 @@
  */
 #include "render.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include "stb_image.h"
@@ -58,6 +59,7 @@ static int _validate_program(GLuint program)
     
     return 0;
 }
+static bmfont_char_t    _characters[256];
 
 /*----------------------------------------------------------------------------*\
 External
@@ -142,4 +144,49 @@ GLuint render_create_texture(const char* filename)
     glBindTexture(GL_TEXTURE_2D, 0);
     
     return texture;
+}
+void render_load_font(const char* filename)
+{
+    uint8_t header[4];
+    const char* full_path = system_get_path(filename);
+    FILE* file = fopen(full_path, "rb");
+    fread(header, sizeof(header), 1, file);
+    if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
+        fclose(file);
+        return;
+    }
+    
+    do {
+        bmfont_block_type_t type;
+        fread(&type, sizeof(type), 1, file);
+        switch(type.type) {
+        case 1: {
+                bmfont_info_t block;
+                fread(&block, type.size, 1, file);
+            }
+            break;
+        case 2: {
+                bmfont_common_t block;
+                fread(&block, type.size, 1, file);
+            }
+            break;
+        case 3: {
+                bmfont_info_t pages;
+                fread(&pages, type.size, 1, file);
+            }
+            break;
+        case 4: {
+                int ii;
+                int num_chars = type.size/sizeof(bmfont_char_t);
+                for(ii=0; ii<num_chars; ++ii) {
+                    bmfont_char_t character;
+                    fread(&character, sizeof(character), 1, file);
+                    _characters[character.id] = character;
+                }
+            }
+            break;
+        case 5:
+            break;
+        }
+    } while(!feof(file) && ferror(file));
 }

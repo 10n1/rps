@@ -91,6 +91,9 @@ void game_initialize(game_t* game)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     game->texture = render_create_texture("r.png");
+    
+    /* Font */
+    render_load_font("font.fnt");
 }
 void game_update(game_t* game)
 {

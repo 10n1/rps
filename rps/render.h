@@ -24,6 +24,61 @@ GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader,
                              const bind_location_t* binds, int num_binds);
 GLuint render_create_texture(const char* filename);
 
+void render_load_font(const char* filename);
+
+#pragma pack(push,1)
+typedef struct {
+    uint8_t     type;
+    uint32_t    size;
+} bmfont_block_type_t;
+
+typedef struct {
+    int16_t     fontSize;
+    uint8_t     bitField; /* bit 0: smooth, bit 1: unicode, bit 2: italic, bit 3: bold, bit 4: fixedHeigth, bits 5-7: reserved */
+    uint8_t     charSet;
+    uint16_t    stretchH;
+    uint8_t     aa;
+    uint8_t     paddingUp;
+    uint8_t     paddingRight;
+    uint8_t     paddingDown;
+    uint8_t     paddingLeft;
+    uint8_t     spacingHoriz;
+    uint8_t     spacingVert;
+    uint8_t     outline;
+    char        name[128];
+} bmfont_info_t;
+
+typedef struct {
+    uint16_t    lineHeight;
+    uint16_t    base;
+    uint16_t    scaleW;
+    uint16_t    scaleH;
+    uint16_t    pages;
+    uint8_t     bitField;
+    uint8_t     alphaChnl;
+    uint8_t     redChnl;
+    uint8_t     greenChnl;
+    uint8_t     blueChnl;    
+} bmfont_common_t;
+
+typedef struct {
+    char    pageNames[128][8];
+} bmfont_pages_t;
+
+typedef struct {
+    uint32_t    id;
+    uint16_t    x;
+    uint16_t    y;
+    uint16_t    width;
+    uint16_t    height;
+    uint16_t    xoffset;
+    uint16_t    yoffset;
+    uint16_t    xadvance;
+    uint8_t     page;
+    uint8_t     chnl;
+} bmfont_char_t;
+#pragma pack(pop)
+
 #ifdef __cplusplus
 }
 #endif
