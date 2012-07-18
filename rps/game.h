@@ -14,22 +14,8 @@
 extern "C" { // Use C linkage
 #endif 
 
-enum {
-    UNIFORM_MODELVIEWPROJECTION_MATRIX,
-    UNIFORM_TEXTURE,
-    UNIFORM_COLOR,
-    NUM_UNIFORMS
-};
-
 typedef struct {
-    
-    /* Render definitions */
-    GLuint  program;
-    GLint   uniforms[NUM_UNIFORMS];
-    GLuint  vao;
-    GLuint  quad_vertex_buffer;
-    GLuint  quad_index_buffer;
-    GLuint  texture;
+    int initialized;
 } game_t;
 
 void game_initialize(game_t* game);

@@ -74,7 +74,7 @@ static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
 static GLKMatrix4       _projectionMatrix;
 static GLuint           _program = 0;
-static GLuint           _quad_mesh = 0;
+static GLuint           _meshes[2] = {0}; /* mesh[0]: fullscreen  mesh[1]: 1x1 */
 static GLint            _uniforms[NUM_UNIFORMS] = {-1};
 
 /*----------------------------------------------------------------------------*\
@@ -83,12 +83,19 @@ External
 void render_init(void)
 {
     char buffer[2048] = {0};
-    const vertex_t vertices[] =
+    const vertex_t quad_vertices[] =
     {
         -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
          0.5f,  0.5f, 0.0f,     1.0f, 0.0f, // TR
          0.5f, -0.5f, 0.0f,     1.0f, 1.0f, // BR
         -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, // BL
+    };
+    const vertex_t fullscreen_quad_vertices[] =
+    {
+        -1.0f,  1.0f, 0.0f,     0.0f, 0.0f, // TL
+         1.0f,  1.0f, 0.0f,     1.0f, 0.0f, // TR
+         1.0f, -1.0f, 0.0f,     1.0f, 1.0f, // BR
+        -1.0f, -1.0f, 0.0f,     0.0f, 1.0f, // BL
     };
     const uint16_t indices[] = 
     {
@@ -103,12 +110,25 @@ void render_init(void)
     GLuint vertex_shader;
     GLuint fragment_shader;
     GLuint buffers[2] = {0};
-    glGenVertexArraysOES(1, &_quad_mesh);
-    glBindVertexArrayOES(_quad_mesh);
+    glGenVertexArraysOES(2, &_meshes);
+    glBindVertexArrayOES(_meshes[0]);
     
     glGenBuffers(2, buffers);
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(fullscreen_quad_vertices), fullscreen_quad_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+    
+    glBindVertexArrayOES(_meshes[1]);
+    
+    glGenBuffers(2, buffers);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
@@ -346,7 +366,7 @@ void render_draw_string(const char* str, float x, float y, float scale)
 void render_draw_fullscreen_quad(void)
 {
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
-    glBindVertexArrayOES(_quad_mesh);
+    glBindVertexArrayOES(_meshes[0]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
@@ -356,6 +376,8 @@ void render_resize(float width, float height)
 }
 void render_prepare(void)
 {
+    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(_program);
     glUniform4f(_uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
 }

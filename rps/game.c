@@ -18,25 +18,20 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-int grid;
+static int grid;
 
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game) 
 {
-    /* Render data */
-    
+    game->initialized = 1;
     /* GL setup */
     render_init();
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    game->texture = render_create_texture("assets/font_0.png");
     grid = render_create_texture("assets/grid.png");
-    
-    /* Font */
-    render_load_font("assets/font.fnt");
 }
 void game_update(game_t* game, float width, float height)
 {
@@ -47,25 +42,11 @@ void game_update(game_t* game, float width, float height)
 }
 void game_render(game_t* game)
 {
-    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
     render_prepare();
     
-    glBindTexture(GL_TEXTURE_2D, game->texture);
-    
-    if(game && 0) {
-        render_draw_letter('@', 0.5f, 0);
-        render_draw_string("Hello", -0.5f, 0.0f, 1.0f);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, grid);
-        render_draw_fullscreen_quad();
-    }
+    glBindTexture(GL_TEXTURE_2D, grid);
+    render_draw_fullscreen_quad();
 }
 void game_shutdown(game_t* game)
 {
-    glDeleteBuffers(1, &game->quad_vertex_buffer);
-    glDeleteVertexArraysOES(1, &game->vao);
-    glDeleteProgram(game->program);
-    glDeleteTextures(1, &game->texture);
 }
