@@ -28,8 +28,9 @@ static int _link_program(GLuint program)
     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
         GLchar *log = (GLchar *)malloc((size_t)logLength);
+        char* message = log;
         glGetProgramInfoLog(program, logLength, &logLength, log);
-        CNSLog("Program link log:\n%s", log);
+        CNSLog("Program link log:%s", message);
         free(log);
     }
 #endif
@@ -50,7 +51,7 @@ static int _validate_program(GLuint program)
     if (logLength > 0) {
         GLchar *log = (GLchar *)malloc((size_t)logLength);
         glGetProgramInfoLog(program, logLength, &logLength, log);
-        CNSLog("Program validate log:\n%s", log);
+        CNSLog("Program validate log:%s", log);
         free(log);
     }
     
@@ -61,21 +62,27 @@ static int _validate_program(GLuint program)
     
     return 0;
 }
+
+enum {
+    UNIFORM_MODELVIEWPROJECTION_MATRIX,
+    UNIFORM_TEXTURE,
+    UNIFORM_COLOR,
+    NUM_UNIFORMS
+};
+
 static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
 static GLKMatrix4       _projectionMatrix;
-
-typedef struct {
-    float   pos[3];
-    float   tex[2];
-} vertex_t;
-static GLuint           _quad_mesh;
+static GLuint           _program = 0;
+static GLuint           _quad_mesh = 0;
+static GLint            _uniforms[NUM_UNIFORMS] = {-1};
 
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
 void render_init(void)
 {
+    char buffer[2048] = {0};
     const vertex_t vertices[] =
     {
         -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
@@ -88,6 +95,13 @@ void render_init(void)
         0, 1, 2,
         3, 2, 0,
     };
+    bind_location_t binds[] = 
+    {
+        { ATTRIB_POSITION, "position" },
+        { ATTRIB_TEXCOORD, "tex" }
+    };
+    GLuint vertex_shader;
+    GLuint fragment_shader;
     GLuint buffers[2] = {0};
     glGenVertexArraysOES(1, &_quad_mesh);
     glBindVertexArrayOES(_quad_mesh);
@@ -104,6 +118,24 @@ void render_init(void)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
     
     glBindVertexArrayOES(0);
+    
+    /* Create program */
+    if(system_load_file("assets/Shaders/Shader.vsh", buffer, sizeof(buffer))) {
+        CNSLog("Vertex shader load failed!\n");
+        return;
+    }
+    vertex_shader = render_create_shader(GL_VERTEX_SHADER, buffer);
+    
+    if(system_load_file("assets/Shaders/Shader.fsh", buffer, sizeof(buffer))) {
+        CNSLog("Fragment shader load failed!\n");
+        return;
+    }    
+    fragment_shader = render_create_shader(GL_FRAGMENT_SHADER, buffer);
+    _program = render_create_program(vertex_shader, fragment_shader, binds, 2);
+    
+    _uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
+    _uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "diffuseTexture");
+    _uniforms[UNIFORM_COLOR] = glGetUniformLocation(_program, "color");
 }
 GLuint render_create_shader(GLenum type, const char* source)
 {   
@@ -282,7 +314,6 @@ void render_load_font(const char* filename)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
         
         glBindVertexArrayOES(0);
-        
     }
 }
 void render_draw_letter(char letter, float x, float y)
@@ -324,4 +355,8 @@ void render_draw_fullscreen_quad(void)
 void render_resize(float width, float height)
 {
     _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
+}
+void render_prepare(void)
+{
+    glUseProgram(_program);
 }

@@ -18,16 +18,6 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-enum {
-    ATTRIB_POSITION,
-    ATTRIB_TEXCOORD,
-    NUM_ATTRIBUTES
-};
-
-typedef struct {
-    float   pos[3];
-    float   tex[2];
-} vertex_t;
 static const vertex_t gQuadVertexData[] =
 {
     -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, // TL
@@ -49,7 +39,7 @@ External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game) 
 {
-    char buffer[2048];
+    char buffer[2048] = {0};
     GLuint vertex_shader;
     GLuint fragment_shader;
     bind_location_t binds[] = 
@@ -77,13 +67,13 @@ void game_initialize(game_t* game)
     glBindVertexArrayOES(0);
     
     /* Program */
-    if(system_load_file("Shader.vsh", buffer, sizeof(buffer))) {
+    if(system_load_file("assets/Shaders/Shader.vsh", buffer, sizeof(buffer))) {
         CNSLog("Vertex shader load failed!\n");
         return;
     }
     vertex_shader = render_create_shader(GL_VERTEX_SHADER, buffer);
     
-    if(system_load_file("Shader.fsh", buffer, sizeof(buffer))) {
+    if(system_load_file("assets/Shaders/Shader.fsh", buffer, sizeof(buffer))) {
         CNSLog("Fragment shader load failed!\n");
         return;
     }    
@@ -97,6 +87,7 @@ void game_initialize(game_t* game)
     uniform_loc = game->uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX];
     
     /* GL setup */
+    render_init();
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -122,7 +113,7 @@ void game_render(game_t* game)
     glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glUseProgram(game->program);
+    render_prepare();
     
     glUniform4f(game->uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, game->texture);
@@ -132,8 +123,9 @@ void game_render(game_t* game)
         render_draw_string("Hello", -0.5f, 0.0f, 1.0f);
     } else {
         glBindTexture(GL_TEXTURE_2D, grid);
-        glBindVertexArrayOES(game->vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+        render_draw_fullscreen_quad();
+//        glBindVertexArrayOES(game->vao);
+//        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     }
 }
 void game_shutdown(game_t* game)

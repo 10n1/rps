@@ -19,9 +19,9 @@ void CNSLog(const char* format, ...)
     char message[1024] = {0};
     va_start(args, format);
     snprintf(message, sizeof(message), format, args);
-    va_end(args);
     
     NSLog(@"%s", message);
+    va_end(args);
 }
 
 @implementation AppDelegate

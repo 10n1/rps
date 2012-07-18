@@ -14,6 +14,16 @@
 extern "C" { // Use C linkage
 #endif
 
+enum {
+    ATTRIB_POSITION,
+    ATTRIB_TEXCOORD,
+    NUM_ATTRIBUTES
+};
+
+typedef struct {
+    float   pos[3];
+    float   tex[2];
+} vertex_t;
 typedef struct {
     uint32_t    index;
     const char* name;
@@ -31,6 +41,8 @@ void render_draw_string(const char* str, float x, float y, float scale);
 void render_resize(float width, float height);
 
 void render_load_font(const char* filename);
+
+void render_prepare(void);
 
 #pragma pack(push,1)
 typedef struct {
