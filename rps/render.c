@@ -318,7 +318,6 @@ void render_load_font(const char* filename)
 }
 void render_draw_letter(char letter, float x, float y)
 {
-    extern int uniform_loc;
     GLKMatrix4 model = GLKMatrix4Identity;
     model.m[12] = x;
     model.m[13] = y;
@@ -326,19 +325,18 @@ void render_draw_letter(char letter, float x, float y)
     model = GLKMatrix4Multiply(model, _projectionMatrix);
     //model = GLKMatrix4Multiply(_projectionMatrix, model);
     
-    glUniformMatrix4fv(uniform_loc, 1, 0, model.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, model.m);
     glBindVertexArrayOES(_character_meshes[letter]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_draw_string(const char* str, float x, float y, float scale)
 {
-    extern int uniform_loc;
     while(*str != '\0') {
         GLKMatrix4 mat = GLKMatrix4MakeTranslation(x, y, 0.0f);
         mat.m00 = mat.m11 = mat.m22 = scale;
         mat = GLKMatrix4Multiply(mat, _projectionMatrix);
         
-        glUniformMatrix4fv(uniform_loc, 1, 0, mat.m);
+        glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, mat.m);
         glBindVertexArrayOES(_character_meshes[*str]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
         x += 1;
@@ -347,10 +345,10 @@ void render_draw_string(const char* str, float x, float y, float scale)
 }
 void render_draw_fullscreen_quad(void)
 {
-    extern int uniform_loc;
-    glUniformMatrix4fv(uniform_loc, 1, 0, GLKMatrix4Identity.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glBindVertexArrayOES(_quad_mesh);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
 void render_resize(float width, float height)
 {
@@ -359,4 +357,5 @@ void render_resize(float width, float height)
 void render_prepare(void)
 {
     glUseProgram(_program);
+    glUniform4f(_uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
 }
