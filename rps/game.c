@@ -35,9 +35,9 @@ void game_initialize(game_t* game)
 }
 void game_update(game_t* game, float width, float height)
 {
-    float aspect = fabsf(width/height);
-    width = 1.0f;
-    height = width/aspect;
+    //float aspect = fabsf(width/height);
+    //width = 1.0f;
+    //height = width/aspect;
     render_resize(width, height);
 }
 void game_render(game_t* game)
@@ -45,7 +45,8 @@ void game_render(game_t* game)
     render_prepare();
     
     glBindTexture(GL_TEXTURE_2D, grid);
-    render_draw_fullscreen_quad();
+    render_draw_quad(0,0,100,100);
+    //render_draw_fullscreen_quad();
 }
 void game_shutdown(game_t* game)
 {

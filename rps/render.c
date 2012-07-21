@@ -370,9 +370,23 @@ void render_draw_fullscreen_quad(void)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
+void render_draw_quad(float x, float y, float width, float height)
+{
+    GLKMatrix4 worldViewProj;
+    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
+    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
+    //world = GLKMatrix4Multiply(GLKMatrix4MakeScale(width, height, 1.0f), world); 
+    worldViewProj = GLKMatrix4Multiply(world, _projectionMatrix);
+    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, worldViewProj.m);
+    glBindVertexArrayOES(_meshes[1]);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    
+}
 void render_resize(float width, float height)
 {
-    _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, -1.0f, 1.0f);
+    _projectionMatrix = GLKMatrix4MakeOrtho(0, width, 0, height, 0.0f, 1.0f);
+    _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
 }
 void render_prepare(void)
 {
