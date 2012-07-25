@@ -70,11 +70,18 @@ enum {
     NUM_UNIFORMS
 };
 
+enum {
+    MESH_FULLSCREEN,
+    MESH_QUAD,
+
+    NUM_MESHES
+};
+
 static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
 static GLKMatrix4       _projectionMatrix;
 static GLuint           _program = 0;
-static GLuint           _meshes[2] = {0}; /* mesh[0]: fullscreen  mesh[1]: 1x1 */
+static GLuint           _meshes[NUM_MESHES] = {0};
 static GLint            _uniforms[NUM_UNIFORMS] = {-1};
 
 /*----------------------------------------------------------------------------*\
@@ -110,8 +117,8 @@ void render_init(void)
     GLuint vertex_shader;
     GLuint fragment_shader;
     GLuint buffers[2] = {0};
-    glGenVertexArraysOES(2, &_meshes);
-    glBindVertexArrayOES(_meshes[0]);
+    glGenVertexArraysOES(NUM_MESHES, &_meshes);
+    glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     
     glGenBuffers(2, buffers);
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -124,7 +131,7 @@ void render_init(void)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
     
-    glBindVertexArrayOES(_meshes[1]);
+    glBindVertexArrayOES(_meshes[MESH_QUAD]);
     
     glGenBuffers(2, buffers);
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -366,7 +373,7 @@ void render_draw_string(const char* str, float x, float y, float scale)
 void render_draw_fullscreen_quad(void)
 {
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
-    glBindVertexArrayOES(_meshes[0]);
+    glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
@@ -377,8 +384,9 @@ void render_draw_quad(float x, float y, float width, float height)
     world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
     //world = GLKMatrix4Multiply(GLKMatrix4MakeScale(width, height, 1.0f), world); 
     worldViewProj = GLKMatrix4Multiply(world, _projectionMatrix);
+    worldViewProj = GLKMatrix4Multiply(_projectionMatrix, world);
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, worldViewProj.m);
-    glBindVertexArrayOES(_meshes[1]);
+    glBindVertexArrayOES(_meshes[MESH_QUAD]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     

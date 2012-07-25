@@ -45,7 +45,7 @@ void game_render(game_t* game)
     render_prepare();
     
     glBindTexture(GL_TEXTURE_2D, grid);
-    render_draw_quad(0,0,100,100);
+    render_draw_quad(100,0,1,1);
     //render_draw_fullscreen_quad();
 }
 void game_shutdown(game_t* game)
