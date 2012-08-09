@@ -11,10 +11,12 @@ attribute vec2 tex;
 
 varying mediump vec2 texVarying;
 
-uniform mat4 modelViewProjectionMatrix;
+uniform mat4 worldMatrix;
+uniform mat4 viewProjectionMatrix;
 
 void main()
 {
     texVarying = tex;
-    gl_Position = modelViewProjectionMatrix * position;
+    vec4 world_pos = worldMatrix * position;
+    gl_Position = viewProjectionMatrix * world_pos;
 }

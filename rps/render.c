@@ -64,7 +64,8 @@ static int _validate_program(GLuint program)
 }
 
 enum {
-    UNIFORM_MODELVIEWPROJECTION_MATRIX,
+    UNIFORM_WORLD_MATRIX,
+    UNIFORM_VIEWPROJECTION_MATRIX,
     UNIFORM_TEXTURE,
     UNIFORM_COLOR,
     NUM_UNIFORMS
@@ -83,6 +84,7 @@ static GLKMatrix4       _projectionMatrix;
 static GLuint           _program = 0;
 static GLuint           _meshes[NUM_MESHES] = {0};
 static GLint            _uniforms[NUM_UNIFORMS] = {-1};
+static GLuint           _font_texture = 0;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -160,9 +162,13 @@ void render_init(void)
     fragment_shader = render_create_shader(GL_FRAGMENT_SHADER, buffer);
     _program = render_create_program(vertex_shader, fragment_shader, binds, 2);
     
-    _uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
+    _uniforms[UNIFORM_VIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "viewProjectionMatrix");
+    _uniforms[UNIFORM_WORLD_MATRIX] = glGetUniformLocation(_program, "worldMatrix");
     _uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "diffuseTexture");
     _uniforms[UNIFORM_COLOR] = glGetUniformLocation(_program, "color");
+
+    render_load_font("assets/font.fnt");
+    _font_texture = render_create_texture("assets/font_0.png");
 }
 GLuint render_create_shader(GLenum type, const char* source)
 {   
@@ -343,57 +349,49 @@ void render_load_font(const char* filename)
         glBindVertexArrayOES(0);
     }
 }
-void render_draw_letter(char letter, float x, float y)
+void render_draw_letter(char letter, float x, float y, float scale)
 {
-    GLKMatrix4 model = GLKMatrix4Identity;
-    model.m[12] = x;
-    model.m[13] = y;
-    
-    model = GLKMatrix4Multiply(model, _projectionMatrix);
-    //model = GLKMatrix4Multiply(_projectionMatrix, model);
-    
-    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, model.m);
+    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
+    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(scale, scale, 1.0f));
+
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     glBindVertexArrayOES(_character_meshes[letter]);
+    glBindTexture(GL_TEXTURE_2D, _font_texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_draw_string(const char* str, float x, float y, float scale)
 {
     while(*str != '\0') {
-        GLKMatrix4 mat = GLKMatrix4MakeTranslation(x, y, 0.0f);
-        mat.m00 = mat.m11 = mat.m22 = scale;
-        mat = GLKMatrix4Multiply(mat, _projectionMatrix);
-        
-        glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, mat.m);
-        glBindVertexArrayOES(_character_meshes[*str]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-        x += 1;
-        ++str;
+        render_draw_letter(*str, x, y, scale);
+        x += _characters[*str].xadvance/512.0f * scale;
+        x += _characters[*str].width/512.0f * scale;
+        str++;
     }
 }
 void render_draw_fullscreen_quad(void)
 {
-    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
 void render_draw_quad(float x, float y, float width, float height)
 {
-    GLKMatrix4 worldViewProj;
     GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
     world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
-    //world = GLKMatrix4Multiply(GLKMatrix4MakeScale(width, height, 1.0f), world); 
-    worldViewProj = GLKMatrix4Multiply(world, _projectionMatrix);
-    worldViewProj = GLKMatrix4Multiply(_projectionMatrix, world);
-    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, worldViewProj.m);
+    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-    glUniformMatrix4fv(_uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     
 }
 void render_resize(float width, float height)
 {
-    _projectionMatrix = GLKMatrix4MakeOrtho(0, width, 0, height, 0.0f, 1.0f);
     _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
 }
 void render_prepare(void)
