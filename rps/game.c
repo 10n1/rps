@@ -56,15 +56,15 @@ void game_update(game_t* game, float width, float height)
     bottom = -(int)height/2;
     left = (int)-width/2;
     render_resize(width, height);
-    buttons[0].c = 'R';
+    buttons[0].c = (char)render_create_texture("assets/rock.png");
     buttons[0].x = left + button_width*0.5f;
     buttons[0].y = bottom;
     buttons[0].scale = button_width;
-    buttons[1].c = 'P';
+    buttons[1].c = (char)render_create_texture("assets/paper.png");
     buttons[1].x = left + button_width*1.5f;
     buttons[1].y = bottom;
     buttons[1].scale = button_width;
-    buttons[2].c = 'S';
+    buttons[2].c = (char)render_create_texture("assets/scissors.png");
     buttons[2].x = left + button_width*2.5f;
     buttons[2].y = bottom;
     buttons[2].scale = button_width;
@@ -82,7 +82,8 @@ void game_render(game_t* game)
             render_set_color(1.0f, 0.0f, 0.0f);
         else
             render_set_color(1.0f, 1.0f, 1.0f);
-        render_draw_letter(buttons[ii].c, buttons[ii].x, buttons[ii].y, buttons[ii].scale );
+        glBindTexture(GL_TEXTURE_2D, (GLuint)buttons[ii].c);
+        render_draw_quad(buttons[ii].x, buttons[ii].y, buttons[ii].scale, buttons[ii].scale );
     }
 }
 void game_shutdown(game_t* game)

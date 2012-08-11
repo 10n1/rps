@@ -10,10 +10,6 @@
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
 
-#ifdef __cplusplus
-extern "C" { // Use C linkage
-#endif
-
 enum {
     ATTRIB_POSITION,
     ATTRIB_TEXCOORD,
@@ -98,9 +94,5 @@ typedef struct {
     uint8_t     chnl;
 } bmfont_char_t;
 #pragma pack(pop)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* include guard */
