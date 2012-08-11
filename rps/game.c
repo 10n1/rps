@@ -18,19 +18,16 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static int grid = 0;
-static float _width = 0;
-static float _height = 0;
-static int button_width = 0;
-static int bottom = 0;
-static int left = 0;
+static float _width     = 320;
+static float _height    = 480;
 static struct {
-    char    c;
-    float   x;
-    float   y;
-    float   scale;
-    int     selected;
-} buttons[3] = { { 'R' }, { 'P' }, { 'S' } };
+    GLuint tex;
+    float x;
+    float y;
+    float scale;
+} _buttons[16] = {0};
+static int _num_buttons = 0;
+static int _selected = -1;
 
 /* Paper and Scissors: http://www.Clker.com */
 /* Rock: http://opengameart.org/content/rocks */
@@ -45,46 +42,38 @@ void game_initialize(game_t* game)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    grid = render_create_texture("assets/grid.png");
+    _buttons[0].tex = render_create_texture("assets/rock.png");
+    _buttons[0].x = -0.25f;
+    _buttons[0].scale = 0.25f;
+    _buttons[1].tex = render_create_texture("assets/paper.png");
+    _buttons[1].x = 0.0f;
+    _buttons[1].scale = 0.25f;
+    _buttons[2].tex = render_create_texture("assets/scissors.png");
+    _buttons[2].x = 0.25f;
+    _buttons[2].scale = 0.25f;
+    _num_buttons = 3;
 }
 void game_update(game_t* game, float width, float height)
 {
     _width = width;
     _height = height;
-    //float aspect = fabsf(width/height);
-    //width = 1.0f;
-    //height = width/aspect;
-    button_width = (int)width/3;
-    bottom = -(int)height/2;
-    left = (int)-width/2;
     render_resize(width, height);
-    buttons[0].c = (char)render_create_texture("assets/rock.png");
-    buttons[0].x = left + button_width*0.5f;
-    buttons[0].y = bottom;
-    buttons[0].scale = button_width;
-    buttons[1].c = (char)render_create_texture("assets/paper.png");
-    buttons[1].x = left + button_width*1.5f;
-    buttons[1].y = bottom;
-    buttons[1].scale = button_width;
-    buttons[2].c = (char)render_create_texture("assets/scissors.png");
-    buttons[2].x = left + button_width*2.5f;
-    buttons[2].y = bottom;
-    buttons[2].scale = button_width;
 }
 void game_render(game_t* game)
 {
     int ii;
     render_prepare();
-    
-    glBindTexture(GL_TEXTURE_2D, grid);
-    //render_draw_quad(160, 0.0f, 320, 1);
-    //render_draw_fullscreen_quad();
-    for(ii=0;ii<3;++ii) {
-        if(buttons[ii].selected)
+
+    for(ii=0;ii<_num_buttons;++ii) {
+        if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);
-        else
+        else            
             render_set_color(1.0f, 1.0f, 1.0f);
-        render_draw_quad((GLuint)buttons[ii].c, buttons[ii].x, buttons[ii].y, buttons[ii].scale, buttons[ii].scale );
+        render_draw_quad(_buttons[ii].tex,
+                         _buttons[ii].x,
+                         _buttons[ii].y,
+                         _buttons[ii].scale,
+                         _buttons[ii].scale);
     }
 }
 void game_shutdown(game_t* game)
@@ -96,16 +85,22 @@ void game_handle_tap(game_t* game, float x, float y)
     int ii;
     x -= _width/2;
     y = -y + _height/2;
+    printf("X: %f\tY: %f\n", x, y);
 
-    if(y >= bottom && y <= bottom+button_width)
-    {
-        for(ii=2;ii>=0;--ii) {
-            if(x > buttons[ii].x - button_width/2 && x <= buttons[ii].x + button_width/2)
-            {
-                buttons[ii].selected = 1;
-                continue;
-            }
-            buttons[ii].selected = 0;
+    x /= _width;
+    y /= _height;
+    printf("X: %f\tY: %f\n", x, y);
+
+    _selected = -1;
+    for (ii=0; ii<_num_buttons; ++ii) {
+        float l = _buttons[ii].x - _buttons[ii].scale/2;
+        float r = _buttons[ii].x + _buttons[ii].scale/2;
+        float b = _buttons[ii].y - _buttons[ii].scale/2;
+        float t = _buttons[ii].y + _buttons[ii].scale/2;
+        if(x > l && x <= r && y > b && y <= t)
+        {
+            _selected = ii;
+            break;
         }
     }
 }
