@@ -84,8 +84,7 @@ void game_render(game_t* game)
             render_set_color(1.0f, 0.0f, 0.0f);
         else
             render_set_color(1.0f, 1.0f, 1.0f);
-        glBindTexture(GL_TEXTURE_2D, (GLuint)buttons[ii].c);
-        render_draw_quad(buttons[ii].x, buttons[ii].y, buttons[ii].scale, buttons[ii].scale );
+        render_draw_quad((GLuint)buttons[ii].c, buttons[ii].x, buttons[ii].y, buttons[ii].scale, buttons[ii].scale );
     }
 }
 void game_shutdown(game_t* game)

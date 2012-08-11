@@ -78,13 +78,11 @@ enum {
     NUM_MESHES
 };
 
-static bmfont_char_t    _characters[256] = {0};
 static GLuint           _character_meshes[256] = {0};
 static GLKMatrix4       _projectionMatrix;
 static GLuint           _program = 0;
 static GLuint           _meshes[NUM_MESHES] = {0};
 static GLint            _uniforms[NUM_UNIFORMS] = {-1};
-static GLuint           _font_texture = 0;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -166,9 +164,6 @@ void render_init(void)
     _uniforms[UNIFORM_WORLD_MATRIX] = glGetUniformLocation(_program, "worldMatrix");
     _uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "diffuseTexture");
     _uniforms[UNIFORM_COLOR] = glGetUniformLocation(_program, "color");
-
-    render_load_font("assets/font.fnt");
-    _font_texture = render_create_texture("assets/font_0.png");
 }
 GLuint render_create_shader(GLenum type, const char* source)
 {   
@@ -255,120 +250,6 @@ GLuint render_create_texture(const char* filename)
     
     return texture;
 }
-void render_load_font(const char* filename)
-{
-    float tex_width;
-    float tex_height;
-    float char_height;
-    int ii, jj;
-    uint8_t header[4];
-    const char* full_path = system_get_path(filename);
-    FILE* file = fopen(full_path, "rb");
-    fread(header, sizeof(header), 1, file);
-    if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
-        fclose(file);
-        return;
-    }
-    
-    do {
-        bmfont_block_type_t type;
-        fread(&type, sizeof(type), 1, file);
-        switch(type.type) {
-        case 1: {
-                bmfont_info_t block;
-                fread(&block, type.size, 1, file);
-                break;
-            }
-        case 2: {
-                bmfont_common_t block;
-                fread(&block, type.size, 1, file);
-                tex_width = (float)block.scaleW;
-                tex_height = (float)block.scaleH;
-                char_height = (float)block.base/tex_height;
-                break;
-            }
-        case 3: {
-                bmfont_info_t pages;
-                fread(&pages, type.size, 1, file);
-                break;
-            }
-        case 4: {
-                int ii;
-                int num_chars = type.size/sizeof(bmfont_char_t);
-                for(ii=0; ii<num_chars; ++ii) {
-                    bmfont_char_t character;
-                    fread(&character, sizeof(character), 1, file);
-                    _characters[character.id] = character;
-                }
-                break;
-            }
-        case 5:
-            break;
-        }
-    } while(!feof(file) && !ferror(file));
-    
-    for(ii=0;ii<256;++ii) {
-        float yoffset = _characters[ii].yoffset/tex_height;
-        float width = _characters[ii].width/tex_width;
-        vertex_t vertices[] = 
-        {
-            -width/2,  char_height+yoffset, 0.0f,      _characters[ii].x,                       _characters[ii].y, // TL
-             width/2,  char_height+yoffset, 0.0f,      _characters[ii].x+_characters[ii].width, _characters[ii].y, // TR
-             width/2,  0.0f+yoffset, 0.0f,             _characters[ii].x+_characters[ii].width, _characters[ii].y+_characters[ii].height, // BR
-            -width/2,  0.0f+yoffset, 0.0f,             _characters[ii].x,                       _characters[ii].y+_characters[ii].height, // BL
-        };
-        const uint16_t indices[] = 
-        {
-            0, 1, 2,
-            3, 2, 0,
-        };
-        GLuint buffers[2];
-        if(_characters[ii].id == 0)
-            continue;
-            
-        for(jj=0;jj<4; ++jj) {
-            vertices[jj].pos[0] /= char_height;
-            vertices[jj].pos[1] /= char_height;
-            vertices[jj].tex[0] /= tex_width;
-            vertices[jj].tex[1] /= tex_height;
-        }
-        glGenVertexArraysOES(1, &_character_meshes[ii]);
-        glBindVertexArrayOES(_character_meshes[ii]);
-        
-        glGenBuffers(2, buffers);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-        
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
-        
-        glBindVertexArrayOES(0);
-    }
-}
-void render_draw_letter(char letter, float x, float y, float scale)
-{
-    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
-    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(scale, scale, 1.0f));
-
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
-    glBindVertexArrayOES(_character_meshes[letter]);
-    glBindTexture(GL_TEXTURE_2D, _font_texture);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-}
-void render_draw_string(const char* str, float x, float y, float scale)
-{
-    while(*str != '\0') {
-        render_draw_letter(*str, x, y, scale);
-        x += _characters[*str].xadvance/512.0f * scale;
-        x += _characters[*str].width/512.0f * scale;
-        str++;
-    }
-}
 void render_draw_fullscreen_quad(void)
 {
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
@@ -377,7 +258,7 @@ void render_draw_fullscreen_quad(void)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
-void render_draw_quad(float x, float y, float width, float height)
+void render_draw_quad(GLuint texture, float x, float y, float width, float height)
 {
     GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
     world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
@@ -385,10 +266,10 @@ void render_draw_quad(float x, float y, float width, float height)
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
-    
 }
 void render_resize(float width, float height)
 {
