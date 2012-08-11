@@ -41,6 +41,7 @@ void CNSLog(const char* format, ...)
 
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+
     return YES;
 }
 

@@ -35,6 +35,7 @@
 
 - (void)viewDidLoad
 {
+    UITapGestureRecognizer *tap = nil;
     GLKView *view = nil;
     
     [super viewDidLoad];
@@ -52,8 +53,16 @@
     [self setupGL];
     
     game_initialize(&_game);
+    
+    tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    tap.numberOfTapsRequired = 1;
+    [[self view] addGestureRecognizer:tap];
 }
-
+- (void)handleTap:(UIGestureRecognizer *)sender
+{
+    CGPoint tapPoint = [sender locationInView:nil];
+    game_handle_tap(&_game, tapPoint.x, tapPoint.y);
+}
 - (void)viewDidUnload
 {    
     [super viewDidUnload];

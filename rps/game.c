@@ -19,6 +19,8 @@ extern void CNSLog(const char* format,...);
 Internal
 \*----------------------------------------------------------------------------*/
 static int grid = 0;
+static float _width = 0;
+static float _height = 0;
 static int button_width = 0;
 static int bottom = 0;
 static int left = 0;
@@ -27,6 +29,7 @@ static struct {
     float   x;
     float   y;
     float   scale;
+    int     selected;
 } buttons[3] = { { 'R' }, { 'P' }, { 'S' } };
 
 /*----------------------------------------------------------------------------*\
@@ -44,6 +47,8 @@ void game_initialize(game_t* game)
 }
 void game_update(game_t* game, float width, float height)
 {
+    _width = width;
+    _height = height;
     //float aspect = fabsf(width/height);
     //width = 1.0f;
     //height = width/aspect;
@@ -72,10 +77,33 @@ void game_render(game_t* game)
     glBindTexture(GL_TEXTURE_2D, grid);
     //render_draw_quad(160, 0.0f, 320, 1);
     //render_draw_fullscreen_quad();
-    for(ii=0;ii<3;++ii)
+    for(ii=0;ii<3;++ii) {
+        if(buttons[ii].selected)
+            render_set_color(1.0f, 0.0f, 0.0f);
+        else
+            render_set_color(1.0f, 1.0f, 1.0f);
         render_draw_letter(buttons[ii].c, buttons[ii].x, buttons[ii].y, buttons[ii].scale );
+    }
 }
 void game_shutdown(game_t* game)
 {
     game->initialized = 0;
+}
+void game_handle_tap(game_t* game, float x, float y)
+{
+    int ii;
+    x -= _width/2;
+    y = -y + _height/2;
+
+    if(y >= bottom && y <= bottom+button_width)
+    {
+        for(ii=2;ii>=0;--ii) {
+            if(x > buttons[ii].x - button_width/2 && x <= buttons[ii].x + button_width/2)
+            {
+                buttons[ii].selected = 1;
+                continue;
+            }
+            buttons[ii].selected = 0;
+        }
+    }
 }

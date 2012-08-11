@@ -394,10 +394,13 @@ void render_resize(float width, float height)
 {
     _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
 }
+void render_set_color(float r, float g, float b)
+{
+    glUniform4f(_uniforms[UNIFORM_COLOR], r, g, b, 1.0f);
+}
 void render_prepare(void)
 {
     glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(_program);
-    glUniform4f(_uniforms[UNIFORM_COLOR], 1.0f, 1.0f, 1.0f, 1.0f);
 }

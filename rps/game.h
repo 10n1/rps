@@ -23,6 +23,8 @@ void game_update(game_t* game, float width, float height);
 void game_render(game_t* game);
 void game_shutdown(game_t* game);
 
+void game_handle_tap(game_t* game, float x, float y);
+
 #ifdef __cplusplus
 }
 #endif
