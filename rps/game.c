@@ -32,6 +32,8 @@ static struct {
     int     selected;
 } buttons[3] = { { 'R' }, { 'P' }, { 'S' } };
 
+/* Paper and Scissors: http://www.Clker.com */
+/* Rock: http://opengameart.org/content/rocks */
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
