@@ -13,8 +13,6 @@
 #include "stb_image.h"
 #include "system.h"
 
-#include "texture2d.h"
-
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
@@ -85,7 +83,6 @@ static GLKMatrix4       _projectionMatrix;
 static GLuint           _program = 0;
 static GLuint           _meshes[NUM_MESHES] = {0};
 static GLint            _uniforms[NUM_UNIFORMS] = {-1};
-static Texture2D*       _font = nil;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -167,8 +164,6 @@ void render_init(void)
     _uniforms[UNIFORM_WORLD_MATRIX] = glGetUniformLocation(_program, "worldMatrix");
     _uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "diffuseTexture");
     _uniforms[UNIFORM_COLOR] = glGetUniformLocation(_program, "color");
-
-    _font = [[Texture2D alloc] initWithString:@"Test" dimensions:CGSizeMake(50, 50) alignment:UITextAlignmentLeft fontName:@"Arial" fontSize:50.0f];
 }
 GLuint render_create_shader(GLenum type, const char* source)
 {   
@@ -271,7 +266,7 @@ void render_draw_quad(GLuint texture, float x, float y, float width, float heigh
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
-    glBindTexture(GL_TEXTURE_2D, [_font name]);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
@@ -289,9 +284,4 @@ void render_prepare(void)
     glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(_program);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnable(GL_TEXTURE_2D);
-    [_font drawAtPoint:CGPointMake(100, 100)];
-    NSLog(@"%@\n", [_font description]);
 }
