@@ -27,6 +27,17 @@ static void _split_filename(const char* filename, char file[128], char ext[16])
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
+void CNSLog(const char* format, ...)
+{
+    va_list args;
+    char message[1024] = {0};
+    va_start(args, format);
+    snprintf(message, sizeof(message), format, args);
+    
+    NSLog(@"%s", message);
+    va_end(args);
+}
+
 int system_load_file(const char* filename, void* buffer, int buffer_size)
 {
     char        file[128];
