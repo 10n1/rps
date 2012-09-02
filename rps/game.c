@@ -50,14 +50,22 @@ void game_initialize(game_t* game)
     _buttons[1].scale = 0.25f;
     _buttons[2].tex = render_create_texture("assets/scissors.png");
     _buttons[2].x = 0.25f;
-    _buttons[2].scale = 0.25f;
+    _buttons[2].scale = 25.0f;
     _num_buttons = 3;
 }
 void game_update(game_t* game, float width, float height)
 {
+    int ii;
     _width = width;
     _height = height;
     render_resize(width, height);
+    
+    for(ii=0;ii<_num_buttons;++ii) {
+        float scale = width/3;
+        _buttons[ii].scale = scale;
+        _buttons[ii].x = ii*scale - width/2 + scale/2;
+        _buttons[ii].y = -height/2 + scale/2;
+    }
 }
 void game_render(game_t* game)
 {
@@ -85,10 +93,6 @@ void game_handle_tap(game_t* game, float x, float y)
     int ii;
     x -= _width/2;
     y = -y + _height/2;
-    printf("X: %f\tY: %f\n", x, y);
-
-    x /= _width;
-    y /= _height;
     printf("X: %f\tY: %f\n", x, y);
 
     _selected = -1;

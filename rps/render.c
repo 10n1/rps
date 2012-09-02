@@ -273,8 +273,7 @@ void render_draw_quad(GLuint texture, float x, float y, float width, float heigh
 }
 void render_resize(float width, float height)
 {
-    float aspect = height/width;
-    _projectionMatrix = GLKMatrix4MakeOrtho(-0.5f, 0.5f, -aspect/2, aspect/2, 0.0f, 1.0f);
+    _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
 }
 void render_set_color(float r, float g, float b)
 {

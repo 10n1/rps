@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 
 #import "ViewController.h"
+#include "texture2d.h"
 
 #include <stdarg.h>
 
