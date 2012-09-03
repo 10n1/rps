@@ -10,6 +10,7 @@
 
 #include "render.h"
 #include "game.h"
+#include "system.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -52,7 +53,7 @@
     
     [self setupGL];
     
-    game_initialize(&_game);
+    game_initialize(&_game, get_device_width(), get_device_height());
     
     tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tap.numberOfTapsRequired = 1;
@@ -108,15 +109,7 @@
 
 - (void)update
 {
-    float width = self.view.bounds.size.width;
-    float height = self.view.bounds.size.height;
-    
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
-        ([UIScreen mainScreen].scale)) {
-        width *= [UIScreen mainScreen].scale;
-        height *= [UIScreen mainScreen].scale;
-    }
-    game_update(&_game, width, height);
+    game_update(&_game);
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -126,10 +119,3 @@
 
 @end
 
-float get_device_scale(void) {
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
-        ([UIScreen mainScreen].scale)) {
-        return [UIScreen mainScreen].scale;
-    }
-    return 1.0f;
-}

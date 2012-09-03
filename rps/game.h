@@ -13,7 +13,12 @@
 
 #ifdef __cplusplus
 extern "C" { // Use C linkage
-#endif 
+#endif
+
+typedef enum {
+    kMainMenu,
+    kGame
+} game_state_t;
 
 typedef struct {
     Timer timer;
@@ -21,8 +26,8 @@ typedef struct {
     int initialized;
 } game_t;
 
-void game_initialize(game_t* game);
-void game_update(game_t* game, float width, float height);
+void game_initialize(game_t* game, float width, float height);
+void game_update(game_t* game);
 void game_render(game_t* game);
 void game_shutdown(game_t* game);
 

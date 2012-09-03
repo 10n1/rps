@@ -178,25 +178,75 @@ void load_font(void) {
         glBindVertexArrayOES(0);
     }
 }
-void draw_text(const char* text, float x, float y, float size) {
-    float draw_x = x;
-    float draw_y = y;
-    size *= get_device_scale()/2;
+static const char* _draw_line(const char* text, float x, float y, float size) {
     while(text && *text) {
         char c = *text;
         bmfont_char_t glyph = _font_chars[c];
         if(c == '\n') {
-            draw_y -= _font_common.lineHeight*size;
-            draw_x = x;
-            ++text;
-            continue;
-        } else if(c != ' ') {
+            return text+1;
+        }
+        if(c != ' ') {
             render_draw_custom_quad(_font_texture, _char_meshes[c],
-                                    draw_x+glyph.xoffset*size,
-                                    draw_y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
+                                    x+glyph.xoffset*size,
+                                    y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
                                     size, size);
         }
-        draw_x += glyph.xadvance * size;
+        x += glyph.xadvance * size;
         ++text;
+    }
+    return NULL;
+}
+void draw_text(const char* text, float x, float y, float size) {
+    const char* orig_text = text;
+    float draw_x = x;
+    float draw_y = y;
+    float total_width = 0;
+    size *= get_device_scale()/2;
+    while(text && *text) {
+        char c = *text;
+        bmfont_char_t glyph = _font_chars[c];
+        total_width += glyph.xadvance * size;
+        ++text;
+    }
+    draw_x -= total_width/2;
+    draw_y = y;
+    text = orig_text;
+    while(text && *text) {
+        text = _draw_line(text, x, y, size);
+        if(text)
+            y -= _font_common.lineHeight*size;
+    }
+}
+void draw_text_formatted(const char* text, text_justification_t justify, float y, float size)
+{
+    const char* orig_text = text;
+    float draw_x = 0.0f;
+    float draw_y = y;
+    float total_width = 0;
+    size *= get_device_scale()/2;
+    while(text && *text) {
+        char c = *text;
+        bmfont_char_t glyph = _font_chars[c];
+        total_width += glyph.xadvance * size;
+        ++text;
+    }
+    text = orig_text;
+    switch(justify) {
+        case kJustifyCenter: {
+            draw_x -= total_width/2;
+            break;
+        }
+        case kJustifyLeft: {
+            draw_x = -get_device_width()/2;
+            break;
+        }
+        default:
+            draw_x = get_device_width()/2-total_width;
+            break;
+    }
+    while(text && *text) {
+        text = _draw_line(text, draw_x, draw_y, size);
+        if(text)
+            y -= _font_common.lineHeight*size;
     }
 }

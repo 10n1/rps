@@ -9,8 +9,15 @@
 #ifndef __font_h__
 #define __font_h__
 
+typedef enum {
+    kJustifyLeft,
+    kJustifyCenter,
+    kJustifyRight
+} text_justification_t;
+
 void load_font(void);
 void draw_text(const char* text, float x, float y, float size);
+void draw_text_formatted(const char* text, text_justification_t justify, float y, float size);
 
 /* @} */
 #endif /* include guard */

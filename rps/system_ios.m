@@ -74,3 +74,16 @@ const char* system_get_path(const char* filename)
     path_name = [[NSBundle mainBundle] pathForResource:file_string ofType:ext_string];
     return [path_name UTF8String];
 }
+float get_device_scale(void) {
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+        ([UIScreen mainScreen].scale)) {
+        return [UIScreen mainScreen].scale;
+    }
+    return 1.0f;
+}
+float get_device_width(void) {
+    return [[UIScreen mainScreen] bounds].size.width * get_device_scale();
+}
+float get_device_height(void) {
+    return [[UIScreen mainScreen] bounds].size.height * get_device_scale();
+}

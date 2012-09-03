@@ -164,6 +164,10 @@ void render_init(void)
     _uniforms[UNIFORM_WORLD_MATRIX] = glGetUniformLocation(_program, "worldMatrix");
     _uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "diffuseTexture");
     _uniforms[UNIFORM_COLOR] = glGetUniformLocation(_program, "color");
+    
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 GLuint render_create_shader(GLenum type, const char* source)
 {   

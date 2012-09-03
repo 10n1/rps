@@ -19,8 +19,8 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static float _width     = 320;
-static float _height    = 480;
+static float _width     = 0;
+static float _height    = 0;
 static struct {
     GLuint tex;
     float x;
@@ -29,21 +29,46 @@ static struct {
 } _buttons[16] = {0};
 static int _num_buttons = 0;
 static int _selected = -1;
+static struct {
+    char name[128];
+    int selection;
+    int score;
+} players[2] = {0};
+
+static void _print_scores(void) {
+    char buffer[256];
+    float scale = 0.35f;
+    if(players[0].score > players[1].score)
+        render_set_color(0.0f, 1.0f, 0.0f);
+    else if(players[0].score == players[1].score)
+        render_set_color(1.0f, 1.0f, 1.0f);
+    else
+        render_set_color(1.0f, 0.0f, 0.0f);        
+    sprintf(buffer, "%s: %d", players[0].name, players[0].score);
+    draw_text_formatted(buffer, kJustifyLeft, _height/2-(128*scale), scale);
+
+    
+    if(players[1].score > players[0].score)
+        render_set_color(0.0f, 1.0f, 0.0f);
+    else if(players[0].score == players[1].score)
+        render_set_color(1.0f, 1.0f, 1.0f);
+    else
+        render_set_color(1.0f, 0.0f, 0.0f);
+    sprintf(buffer, "%s: %d", players[1].name, players[1].score);
+    draw_text_formatted(buffer, kJustifyRight, _height/2-(128*scale), scale);
+}
 
 /* Paper and Scissors: http://www.Clker.com */
 /* Rock: http://opengameart.org/content/rocks */
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
-void game_initialize(game_t* game) 
-{
+void game_initialize(game_t* game, float width, float height) {
+    int ii;
     game->initialized = 1;
     load_font();
     /* GL setup */
     render_init();
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     _buttons[0].tex = render_create_texture("assets/rock.png");
     _buttons[0].x = -0.25f;
     _buttons[0].scale = 0.25f;
@@ -54,13 +79,6 @@ void game_initialize(game_t* game)
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
     _num_buttons = 3;
-
-    timer_init(&game->timer);
-}
-void game_update(game_t* game, float width, float height)
-{
-    int ii;
-    game->delta_time = (float)timer_delta_time(&game->timer);
     _width = width;
     _height = height;
     render_resize(width, height);
@@ -71,17 +89,21 @@ void game_update(game_t* game, float width, float height)
         _buttons[ii].x = ii*scale - width/2 + scale/2;
         _buttons[ii].y = -height/2 + scale/2;
     }
+
+    timer_init(&game->timer);
+    sprintf(players[0].name, "Player");
+    sprintf(players[1].name, "Computer");
 }
-void game_render(game_t* game)
-{
-    float scale = 0.25f;
+void game_update(game_t* game) {
+    game->delta_time = (float)timer_delta_time(&game->timer);
+    ++players[0].score;
+}
+void game_render(game_t* game) {
     int ii;
-    char buffer[256];
     render_prepare();
 
+    _print_scores();
     render_set_color(1.0f, 1.0f, 1.0f);
-    sprintf(buffer, "FPS: %.2f", 1.0f/game->delta_time);
-    draw_text(buffer, -_width/2, _height/2-(128*scale), scale);
     for(ii=0;ii<_num_buttons;++ii) {
         if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);
@@ -94,12 +116,10 @@ void game_render(game_t* game)
                          _buttons[ii].scale);
     }
 }
-void game_shutdown(game_t* game)
-{
+void game_shutdown(game_t* game) {
     game->initialized = 0;
 }
-void game_handle_tap(game_t* game, float x, float y)
-{
+void game_handle_tap(game_t* game, float x, float y) {
     int ii;
     x -= _width/2;
     y = -y + _height/2;

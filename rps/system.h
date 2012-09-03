@@ -14,6 +14,9 @@ extern "C" { // Use C linkage
 void CNSLog(const char* format, ...);
 int system_load_file(const char* filename, void* buffer, int buffer_size);
 const char* system_get_path(const char* filename);
+float get_device_scale(void);
+float get_device_width(void);
+float get_device_height(void);
 
 #ifdef __cplusplus
 }

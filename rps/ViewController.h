@@ -14,3 +14,5 @@
 @end
 
 float get_device_scale(void);
+float get_device_width(void);
+float get_device_height(void);
