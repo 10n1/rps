@@ -5,7 +5,7 @@ fileVersion=1
 fontName=Arial
 fontFile=
 charSet=0
-fontSize=32
+fontSize=128
 aa=1
 scaleH=100
 useSmoothing=1
@@ -26,12 +26,12 @@ paddingRight=0
 paddingLeft=0
 spacingHoriz=1
 spacingVert=1
-useFixedHeight=1
+useFixedHeight=0
 forceZero=0
 
 # output file
-outWidth=512
-outHeight=512
+outWidth=1024
+outHeight=1024
 outBitDepth=32
 fontDescFormat=2
 fourChnlPacked=0
