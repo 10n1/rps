@@ -45,21 +45,20 @@ static int _link_program(GLuint program)
 static int _validate_program(GLuint program)
 {
     GLint logLength, status;
-    
+
     glValidateProgram(program);
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc((size_t)logLength);
-        glGetProgramInfoLog(program, logLength, &logLength, log);
-        CNSLog("Program validate log:%s", log);
-        free(log);
-    }
-    
+
     glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
-    if (status == 0) {
-        return 1;
+    if (status == GL_FALSE && 0) {
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            char *log = (char*)malloc((size_t)logLength);
+            glGetProgramInfoLog(program, logLength, &logLength, (GLchar*)log);
+            CNSLog("Program validate log:%s", log);
+            free(log);
+            return 1;
+        }
     }
-    
     return 0;
 }
 
@@ -248,7 +247,7 @@ GLuint render_create_texture(const char* filename)
         return 0;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
     
     glBindTexture(GL_TEXTURE_2D, 0);
