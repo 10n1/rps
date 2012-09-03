@@ -10,7 +10,7 @@
 #define __font_h__
 
 void load_font(void);
-void draw_text(const char* text, float x, float y);
+void draw_text(const char* text, float x, float y, float size);
 
 /* @} */
 #endif /* include guard */

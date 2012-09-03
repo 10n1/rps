@@ -11,6 +11,8 @@
 #include "render.h"
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+extern float get_device_scale(void);
+
 /*
  * Internal 
  */
@@ -141,10 +143,10 @@ void load_font(void) {
         bmfont_char_t c = _font_chars[ii];
         vertex_t quad_vertices[] =
         {
-            0.0f,    c.height, 0.0f,     c.x,         c.y, // TL
-            c.width, c.height, 0.0f,     c.x+c.width, c.y, // TR
-            c.width, 0.0f,     0.0f,     c.x+c.width, c.y+c.height,          // BR
-            0.0f,    0.0f,     0.0f,     c.x,         c.y+c.height,          // BL
+            0.0f,    c.height, 0.0f,     c.x,         c.y,          // TL
+            c.width, c.height, 0.0f,     c.x+c.width, c.y,          // TR
+            c.width, 0.0f,     0.0f,     c.x+c.width, c.y+c.height, // BR
+            0.0f,    0.0f,     0.0f,     c.x,         c.y+c.height, // BL
         };
         const uint16_t indices[] =
         {
@@ -176,14 +178,23 @@ void load_font(void) {
         glBindVertexArrayOES(0);
     }
 }
-void draw_text(const char* text, float x, float y) {
+void draw_text(const char* text, float x, float y, float size) {
+    float draw_x = x;
+    float draw_y = y;
+    size *= get_device_scale()/2;
     while(text && *text) {
         char c = *text;
+        if(c == '\n') {
+            draw_y -= _font_chars['Q'].height;
+            draw_x = x;
+            ++text;
+            continue;
+        }
         render_draw_custom_quad(_font_texture, _char_meshes[c],
-                                x+_font_chars[c].xoffset,
-                                y+_font_chars[c].yoffset,
-                                1, 1);
-        x += _font_chars[c].xadvance;
+                                draw_x+_font_chars[c].xoffset,
+                                draw_y+_font_chars[c].yoffset,
+                                size, size);
+        draw_x += _font_chars[c].xadvance * size;
         ++text;
     }
 }

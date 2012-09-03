@@ -108,6 +108,12 @@
 {
     float width = self.view.bounds.size.width;
     float height = self.view.bounds.size.height;
+    
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+        ([UIScreen mainScreen].scale)) {
+        width *= [UIScreen mainScreen].scale;
+        height *= [UIScreen mainScreen].scale;
+    }
     game_update(&_game, width, height);
 }
 
@@ -117,3 +123,11 @@
 }
 
 @end
+
+float get_device_scale(void) {
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+        ([UIScreen mainScreen].scale)) {
+        return [UIScreen mainScreen].scale;
+    }
+    return 1.0f;
+}

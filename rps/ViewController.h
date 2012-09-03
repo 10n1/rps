@@ -12,3 +12,5 @@
 @interface ViewController : GLKViewController
 
 @end
+
+float get_device_scale(void);
