@@ -2,7 +2,7 @@
 fileVersion=1
 
 # font settings
-fontName=Arial
+fontName=TitilliumText22L Rg
 fontFile=
 charSet=0
 fontSize=128
@@ -50,6 +50,6 @@ invB=0
 outlineThickness=0
 
 # selected chars
-chars=32-126,160-255
+chars=32-126,161-172,174-187,191-255
 
 # imported icon images

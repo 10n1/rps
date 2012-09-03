@@ -81,6 +81,7 @@ static weapon_t _get_computer_move(void) {
 
 /* Paper and Scissors: http://www.Clker.com */
 /* Rock: http://opengameart.org/content/rocks */
+/* Font: http://www.fontsquirrel.com/fonts/TitilliumText */
 /*----------------------------------------------------------------------------*\
 External
 \*----------------------------------------------------------------------------*/
@@ -119,36 +120,54 @@ void game_initialize(game_t* game, float width, float height) {
     sprintf(_players[1].name, "Computer");
     _players[0].selection = _players[1].selection = kInvalid;
     game->round_timer = 4.0f;
+    game->round_state = kRoundStart;
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
     game->round_timer -= game->delta_time;
-    if(game->round_timer < 0.0f) {
-        _players[1].selection = _get_computer_move();
-        switch(_players[0].selection) {
-            case kRock:
-                if(_players[1].selection == kPaper)
+    game->results_timer -= game->delta_time;
+    switch(game->round_state) {
+        case kRoundStart:
+            game->round_timer = 4.0f;
+            game->round_state = kRoundPicking;
+            break;
+        case kRoundPicking:
+            _players[1].selection = _get_computer_move();
+            if(game->round_timer < 0.0f) {
+                game->round_state = kRoundResults;
+                game->results_timer = 3.0f;
+            }
+            break;
+        case kRoundResults:
+            switch(_players[0].selection) {
+                case kRock:
+                    if(_players[1].selection == kPaper) {
+                        ++_players[1].score;
+                    } else if(_players[1].selection == kScissors) {
+                        ++_players[0].score;
+                    }
+                    break;
+                case kPaper:
+                    if(_players[1].selection == kScissors) {
+                        ++_players[1].score;
+                    } else if(_players[1].selection == kRock) {
+                        ++_players[0].score;
+                    }
+                    break;
+                case kScissors:
+                    if(_players[1].selection == kRock) {
+                        ++_players[1].score;
+                    } else if(_players[1].selection == kPaper) {
+                        ++_players[0].score;
+                    }
+                    break;
+                default:
                     ++_players[1].score;
-                else if(_players[1].selection == kScissors)
-                    ++_players[0].score;
-                break;
-            case kPaper:
-                if(_players[1].selection == kScissors)
-                    ++_players[1].score;
-                else if(_players[1].selection == kRock)
-                    ++_players[0].score;
-                break;
-            case kScissors:
-                if(_players[1].selection == kRock)
-                    ++_players[1].score;
-                else if(_players[1].selection == kPaper)
-                    ++_players[0].score;
-                break;
-            default:
-                ++_players[1].score;
-                break;
-        }
-        game->round_timer = 3.999999f;
+                    break;
+            }
+            if(game->results_timer < 0.0f)
+                game->round_state = kRoundStart;
+            break;
     }
 }
 void game_render(game_t* game) {

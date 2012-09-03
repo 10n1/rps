@@ -94,7 +94,7 @@ static GLuint           _char_meshes[256] = {0};
 void load_font(void) {
     int ii, jj;
     uint8_t header[4];
-    FILE* file = fopen(system_get_path("assets/verdanas.fnt"), "rb");
+    FILE* file = fopen(system_get_path("assets/Titillium.fnt"), "rb");
     fread(header, sizeof(header), 1, file);
     if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
         fclose(file);
