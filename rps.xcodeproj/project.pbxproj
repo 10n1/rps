@@ -11,6 +11,7 @@
 		27169E4D15AF1B2800617BE7 /* system_ios.m in Sources */ = {isa = PBXBuildFile; fileRef = 27169E4C15AF1B2800617BE7 /* system_ios.m */; };
 		2730F63815D64E680058A89B /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 2730F63715D64E680058A89B /* assets */; };
 		275405CD15AF262900B85F9F /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 275405CC15AF262900B85F9F /* stb_image.c */; };
+		2772A22215F470650074077F /* timer.c in Sources */ = {isa = PBXBuildFile; fileRef = 2772A22015F470650074077F /* timer.c */; };
 		277A363015AEA37B009A067D /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = 277A362F15AEA37B009A067D /* render.c */; };
 		27A0C16015ACDACD000BA591 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A0C15F15ACDACD000BA591 /* UIKit.framework */; };
 		27A0C16215ACDACD000BA591 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A0C16115ACDACD000BA591 /* Foundation.framework */; };
@@ -34,6 +35,8 @@
 		2730F63715D64E680058A89B /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		275405CC15AF262900B85F9F /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
 		275405CE15AF263A00B85F9F /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		2772A22015F470650074077F /* timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timer.c; sourceTree = "<group>"; };
+		2772A22115F470650074077F /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		277A362D15AEA244009A067D /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		277A362F15AEA37B009A067D /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
 		27A0C15B15ACDACD000BA591 /* rps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rps.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +107,8 @@
 		27A0C16915ACDACD000BA591 /* rps */ = {
 			isa = PBXGroup;
 			children = (
+				2772A22015F470650074077F /* timer.c */,
+				2772A22115F470650074077F /* timer.h */,
 				275405CE15AF263A00B85F9F /* stb_image.h */,
 				275405CC15AF262900B85F9F /* stb_image.c */,
 				27A0C17215ACDACD000BA591 /* AppDelegate.h */,
@@ -207,6 +212,7 @@
 				27169E4D15AF1B2800617BE7 /* system_ios.m in Sources */,
 				275405CD15AF262900B85F9F /* stb_image.c in Sources */,
 				27D51E4515F3E5E9002EECE6 /* font.c in Sources */,
+				2772A22215F470650074077F /* timer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

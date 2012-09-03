@@ -9,12 +9,15 @@
 
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
+#include "timer.h"
 
 #ifdef __cplusplus
 extern "C" { // Use C linkage
 #endif 
 
 typedef struct {
+    Timer timer;
+    float delta_time;
     int initialized;
 } game_t;
 

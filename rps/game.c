@@ -54,10 +54,13 @@ void game_initialize(game_t* game)
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
     _num_buttons = 3;
+
+    timer_init(&game->timer);
 }
 void game_update(game_t* game, float width, float height)
 {
     int ii;
+    game->delta_time = (float)timer_delta_time(&game->timer);
     _width = width;
     _height = height;
     render_resize(width, height);
@@ -71,11 +74,14 @@ void game_update(game_t* game, float width, float height)
 }
 void game_render(game_t* game)
 {
+    float scale = 0.25f;
     int ii;
+    char buffer[256];
     render_prepare();
 
     render_set_color(1.0f, 1.0f, 1.0f);
-    draw_text("This is crazy text\nwith newline support", -_width/2, 0, 0.5f);
+    sprintf(buffer, "FPS: %.2f", 1.0f/game->delta_time);
+    draw_text(buffer, -_width/2, _height/2-(128*scale), scale);
     for(ii=0;ii<_num_buttons;++ii) {
         if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);
