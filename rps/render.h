@@ -33,6 +33,7 @@ GLuint render_create_texture(const char* filename);
 
 void render_set_color(float r, float g, float b);
 void render_draw_quad(GLuint texture, float x, float y, float width, float height);
+void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height);
 void render_draw_fullscreen_quad(void);
 void render_resize(float width, float height);
 

@@ -11,6 +11,7 @@
 
 #include "system.h"
 #include "render.h"
+#include "font.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -37,6 +38,7 @@ External
 void game_initialize(game_t* game) 
 {
     game->initialized = 1;
+    load_font();
     /* GL setup */
     render_init();
     glEnable(GL_TEXTURE_2D);
@@ -72,6 +74,12 @@ void game_render(game_t* game)
     int ii;
     render_prepare();
 
+    draw_text("Hello", 0, 0);
+//    render_draw_quad(_buttons[0].tex,
+//                     0,
+//                     0,
+//                     100,
+//                     100);
     for(ii=0;ii<_num_buttons;++ii) {
         if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);

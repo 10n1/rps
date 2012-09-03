@@ -244,6 +244,7 @@ GLuint render_create_texture(const char* filename)
         return 0;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
     
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -268,8 +269,16 @@ void render_draw_quad(GLuint texture, float x, float y, float width, float heigh
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
+}
+void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height) {
+    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
+    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
+    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glBindVertexArrayOES(vao);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_resize(float width, float height)
 {

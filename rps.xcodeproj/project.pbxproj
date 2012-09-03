@@ -23,6 +23,7 @@
 		27A0C17B15ACDACD000BA591 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27A0C17A15ACDACD000BA591 /* ViewController.m */; };
 		27A0C17E15ACDACD000BA591 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17C15ACDACD000BA591 /* ViewController_iPhone.xib */; };
 		27A0C18115ACDACD000BA591 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17F15ACDACD000BA591 /* ViewController_iPad.xib */; };
+		27D51E4515F3E5E9002EECE6 /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 27D51E4315F3E5E9002EECE6 /* font.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,8 @@
 		27A0C17A15ACDACD000BA591 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		27A0C17D15ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		27A0C18015ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
+		27D51E4315F3E5E9002EECE6 /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
+		27D51E4415F3E5E9002EECE6 /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +119,8 @@
 				27169E4915AF175300617BE7 /* game.c */,
 				27169E4B15AF1AE800617BE7 /* system.h */,
 				27169E4C15AF1B2800617BE7 /* system_ios.m */,
+				27D51E4315F3E5E9002EECE6 /* font.c */,
+				27D51E4415F3E5E9002EECE6 /* font.h */,
 			);
 			path = rps;
 			sourceTree = "<group>";
@@ -201,6 +206,7 @@
 				27169E4A15AF175300617BE7 /* game.c in Sources */,
 				27169E4D15AF1B2800617BE7 /* system_ios.m in Sources */,
 				275405CD15AF262900B85F9F /* stb_image.c in Sources */,
+				27D51E4515F3E5E9002EECE6 /* font.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
