@@ -66,9 +66,9 @@ typedef struct {
     uint16_t    y;
     uint16_t    width;
     uint16_t    height;
-    uint16_t    xoffset;
-    uint16_t    yoffset;
-    uint16_t    xadvance;
+    int16_t     xoffset;
+    int16_t     yoffset;
+    int16_t     xadvance;
     uint8_t     page;
     uint8_t     chnl;
 } bmfont_char_t;
@@ -90,7 +90,7 @@ static GLuint           _char_meshes[256] = {0};
  * External
  */
 void load_font(void) {
-    int ii;
+    int ii, jj;
     uint8_t header[4];
     FILE* file = fopen(system_get_path("assets/font.fnt"), "rb");
     fread(header, sizeof(header), 1, file);
@@ -125,6 +125,8 @@ void load_font(void) {
                 for(ii=0; ii<num_chars; ++ii) {
                     bmfont_char_t character;
                     fread(&character, sizeof(character), 1, file);
+                    if(character.id == 'A')
+                        _font_chars[character.id] = character;
                     _font_chars[character.id] = character;
                 }
                 break;
@@ -137,12 +139,12 @@ void load_font(void) {
 
     for(ii=0;ii<256;++ii) {
         bmfont_char_t c = _font_chars[ii];
-        const vertex_t quad_vertices[] =
+        vertex_t quad_vertices[] =
         {
-            0.0f,    c.height, 0.0f,     c.x+c.width, c.y+c.height, // TL
-            c.width, c.height, 0.0f,     c.x,         c.y+c.height, // TR
-            c.width, 0.0f,     0.0f,     c.x+c.width, c.y,          // BR
-            0.0f,    0.0f,     0.0f,     c.x,         c.y,          // BL
+            0.0f,    c.height, 0.0f,     c.x,         c.y, // TL
+            c.width, c.height, 0.0f,     c.x+c.width, c.y, // TR
+            c.width, 0.0f,     0.0f,     c.x+c.width, c.y+c.height,          // BR
+            0.0f,    0.0f,     0.0f,     c.x,         c.y+c.height,          // BL
         };
         const uint16_t indices[] =
         {
@@ -154,6 +156,11 @@ void load_font(void) {
             continue;
         glGenVertexArraysOES(1, &_char_meshes[ii]);
         glBindVertexArrayOES(_char_meshes[ii]);
+
+        for (jj=0; jj<4; ++jj) {
+            quad_vertices[jj].tex[0] /= (float)_font_common.scaleW;
+            quad_vertices[jj].tex[1] /= (float)_font_common.scaleH;
+        }
 
         glGenBuffers(2, buffers);
         glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -170,5 +177,13 @@ void load_font(void) {
     }
 }
 void draw_text(const char* text, float x, float y) {
-    render_draw_quad(_font_texture, x, y, 1, 1);
+    while(text && *text) {
+        char c = *text;
+        render_draw_custom_quad(_font_texture, _char_meshes[c],
+                                x+_font_chars[c].xoffset,
+                                y+_font_chars[c].yoffset,
+                                1, 1);
+        x += _font_chars[c].xadvance;
+        ++text;
+    }
 }

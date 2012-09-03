@@ -74,12 +74,8 @@ void game_render(game_t* game)
     int ii;
     render_prepare();
 
-    draw_text("Hello", 0, 0);
-//    render_draw_quad(_buttons[0].tex,
-//                     0,
-//                     0,
-//                     100,
-//                     100);
+    render_set_color(1.0f, 1.0f, 1.0f);
+    draw_text("Test@#$%^&*", -_width/2, 0);
     for(ii=0;ii<_num_buttons;++ii) {
         if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);

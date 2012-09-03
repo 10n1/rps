@@ -261,14 +261,7 @@ void render_draw_fullscreen_quad(void)
 }
 void render_draw_quad(GLuint texture, float x, float y, float width, float height)
 {
-    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
-    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
-    
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
-    glBindVertexArrayOES(_meshes[MESH_QUAD]);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+    render_draw_custom_quad(texture, _meshes[MESH_QUAD], x, y, width, height);
 }
 void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height) {
     GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
