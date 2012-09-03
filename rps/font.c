@@ -94,7 +94,7 @@ static GLuint           _char_meshes[256] = {0};
 void load_font(void) {
     int ii, jj;
     uint8_t header[4];
-    FILE* file = fopen(system_get_path("assets/font.fnt"), "rb");
+    FILE* file = fopen(system_get_path("assets/comic_sans.fnt"), "rb");
     fread(header, sizeof(header), 1, file);
     if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
         fclose(file);
@@ -184,17 +184,18 @@ void draw_text(const char* text, float x, float y, float size) {
     size *= get_device_scale()/2;
     while(text && *text) {
         char c = *text;
+        bmfont_char_t glyph = _font_chars[c];
         if(c == '\n') {
-            draw_y -= _font_chars['Q'].height;
+            draw_y -= _font_chars['Q'].height*size;
             draw_x = x;
             ++text;
             continue;
         }
         render_draw_custom_quad(_font_texture, _char_meshes[c],
-                                draw_x+_font_chars[c].xoffset,
-                                draw_y+_font_chars[c].yoffset,
+                                draw_x+glyph.xoffset*size,
+                                draw_y+glyph.yoffset*size,
                                 size, size);
-        draw_x += _font_chars[c].xadvance * size;
+        draw_x += glyph.xadvance * size;
         ++text;
     }
 }

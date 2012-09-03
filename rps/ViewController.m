@@ -61,6 +61,8 @@
 - (void)handleTap:(UIGestureRecognizer *)sender
 {
     CGPoint tapPoint = [sender locationInView:nil];
+    tapPoint.x *= get_device_scale();
+    tapPoint.y *= get_device_scale();
     game_handle_tap(&_game, tapPoint.x, tapPoint.y);
 }
 - (void)viewDidUnload

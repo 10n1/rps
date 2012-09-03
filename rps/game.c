@@ -75,7 +75,7 @@ void game_render(game_t* game)
     render_prepare();
 
     render_set_color(1.0f, 1.0f, 1.0f);
-    draw_text("Test@#$%^&*\nNew line", -_width/2, 0, 1.0f);
+    draw_text("This is crazy text\nwith newline support", -_width/2, 0, 1.0f);
     for(ii=0;ii<_num_buttons;++ii) {
         if(ii == _selected)
             render_set_color(1.0f, 0.0f, 0.0f);
