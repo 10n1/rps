@@ -31,7 +31,7 @@ GLuint render_create_program(GLuint vertex_shader, GLuint fragment_shader,
                              const bind_location_t* binds, int num_binds);
 GLuint render_create_texture(const char* filename);
 
-void render_set_color(float r, float g, float b);
+void render_set_color(float r, float g, float b, float a);
 void render_draw_quad(GLuint texture, float x, float y, float width, float height);
 void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height);
 void render_draw_fullscreen_quad(void);

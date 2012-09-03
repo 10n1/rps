@@ -20,10 +20,19 @@ typedef enum {
     kGame
 } game_state_t;
 
+typedef enum {
+    kRock,
+    kPaper,
+    kScissors,
+
+    kInvalid = -1
+} weapon_t;
+
 typedef struct {
     Timer timer;
     float delta_time;
     int initialized;
+    float round_timer;
 } game_t;
 
 void game_initialize(game_t* game, float width, float height);
