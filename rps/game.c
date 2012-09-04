@@ -16,6 +16,8 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #define max(a, b) ((a > b) ? a : b)
+#define min(a, b) ((a < b) ? a : b)
+
 extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
@@ -35,6 +37,7 @@ static struct {
     weapon_t selection;
     int score;
 } _players[2] = {0};
+static GLuint _sheet_texture = 0;
 
 static void _print_scores(void) {
     char buffer[256];
@@ -118,7 +121,7 @@ void game_initialize(game_t* game, float width, float height) {
         _buttons[ii].x = ii*scale - width/2 + scale/2;
         _buttons[ii].y = -height/2 + scale/2;
     }
-
+    _sheet_texture = render_create_texture("assets/sheet.png");
     timer_init(&game->timer);
     sprintf(_players[0].name, "Player");
     sprintf(_players[1].name, "Computer");
@@ -209,6 +212,10 @@ void game_render(game_t* game) {
                     render_draw_quad_transform(_buttons[_players[0].selection].tex, transform);
                     break;
                 case kPaper:
+                    percent = (3.0f-game->results_timer)/3.0f;
+                    x = lerp(get_device_width()/2, 0.0f, min(1.0f,percent*2));
+                    render_draw_quad(_sheet_texture, -x, y, 100.0f, 100.0f);
+                    break;
                 case kScissors:
                     render_draw_quad(_buttons[_players[0].selection].tex, -x, y, 100.0f, 100.0f);
                     break;
@@ -216,6 +223,8 @@ void game_render(game_t* game) {
                     break;
             }
 
+            percent = (3.0f-game->results_timer)/3.0f;
+            x = lerp(get_device_width()/2, 0.0f, percent);
             switch(_players[1].selection) {
                 case kRock:
                     transform = GLKMatrix4Multiply(GLKMatrix4MakeScale(100.0f, 100.0f, 1.0f), GLKMatrix4MakeZRotation(percent*3.5f));
