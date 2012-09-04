@@ -22,9 +22,9 @@ typedef enum {
 } round_state_t;
 
 typedef enum {
-    kRock,
-    kPaper,
-    kScissors,
+    kRock = 0,
+    kPaper = 1,
+    kScissors = 2,
 
     kInvalid = -1
 } weapon_t;

@@ -15,6 +15,7 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#define max(a, b) ((a > b) ? a : b)
 extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
@@ -73,10 +74,13 @@ static void _print_timer(float f) {
         sprintf(buffer, "Scissors!");
     else
         sprintf(buffer, "Shoot!");
-    draw_text_formatted(buffer, kJustifyCenter, 0.0f, opacity*2.0f);
+    draw_text_formatted(buffer, kJustifyCenter, 0.0f, opacity*2.0f + 1.0f);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
+}
+static float lerp(float a, float b, float t) {
+    return a + t*(b-a);
 }
 
 /* Paper and Scissors: http://www.Clker.com */
@@ -98,7 +102,7 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[1].tex = render_create_texture("assets/paper.png");
     _buttons[1].x = 0.0f;
     _buttons[1].scale = 0.25f;
-    _buttons[0].weapon = kPaper;
+    _buttons[1].weapon = kPaper;
     _buttons[2].tex = render_create_texture("assets/scissors.png");
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
@@ -121,6 +125,7 @@ void game_initialize(game_t* game, float width, float height) {
     _players[0].selection = _players[1].selection = kInvalid;
     game->round_timer = 4.0f;
     game->round_state = kRoundStart;
+    //srand((uint32_t)game->timer.start_time);
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
@@ -138,36 +143,44 @@ void game_update(game_t* game) {
                 game->results_timer = 3.0f;
             }
             break;
-        case kRoundResults:
-            switch(_players[0].selection) {
-                case kRock:
-                    if(_players[1].selection == kPaper) {
+        case kRoundResults: {
+            static int begin = 1;
+            if(begin) {
+                switch(_players[0].selection) {
+                    case kRock:
+                        if(_players[1].selection == kPaper) {
+                            ++_players[1].score;
+                        } else if(_players[1].selection == kScissors) {
+                            ++_players[0].score;
+                        }
+                        break;
+                    case kPaper:
+                        if(_players[1].selection == kScissors) {
+                            ++_players[1].score;
+                        } else if(_players[1].selection == kRock) {
+                            ++_players[0].score;
+                        }
+                        break;
+                    case kScissors:
+                        if(_players[1].selection == kRock) {
+                            ++_players[1].score;
+                        } else if(_players[1].selection == kPaper) {
+                            ++_players[0].score;
+                        }
+                        break;
+                    default:
                         ++_players[1].score;
-                    } else if(_players[1].selection == kScissors) {
-                        ++_players[0].score;
-                    }
-                    break;
-                case kPaper:
-                    if(_players[1].selection == kScissors) {
-                        ++_players[1].score;
-                    } else if(_players[1].selection == kRock) {
-                        ++_players[0].score;
-                    }
-                    break;
-                case kScissors:
-                    if(_players[1].selection == kRock) {
-                        ++_players[1].score;
-                    } else if(_players[1].selection == kPaper) {
-                        ++_players[0].score;
-                    }
-                    break;
-                default:
-                    ++_players[1].score;
-                    break;
+                        break;
+                }
+                begin = 0;
+            } else {
+                if(game->results_timer < 0.0f) {
+                    game->round_state = kRoundStart;
+                    begin = 1;
+                }
             }
-            if(game->results_timer < 0.0f)
-                game->round_state = kRoundStart;
             break;
+        }
     }
 }
 void game_render(game_t* game) {
@@ -175,13 +188,56 @@ void game_render(game_t* game) {
     render_prepare();
 
     _print_scores();
-    _print_timer(game->round_timer);
+    switch(game->round_state) {
+        case kRoundStart:
+            break;
+        case kRoundPicking:
+            _print_timer(game->round_timer);
+            break;
+        case kRoundResults: {
+            GLKMatrix4 transform = GLKMatrix4Identity;
+            float x, y, percent;
+            percent = (3.0f-game->results_timer)/3.0f;
+            x = lerp(get_device_width()/2, 0.0f, percent);
+            y = 0.0f;
+            render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+
+            switch(_players[0].selection) {
+                case kRock:
+                    transform = GLKMatrix4Multiply(GLKMatrix4MakeScale(100.0f, 100.0f, 1.0f), GLKMatrix4MakeZRotation(-percent*3.5f));
+                    transform = GLKMatrix4Multiply(GLKMatrix4MakeTranslation(-x, y, 0.0f), transform);
+                    render_draw_quad_transform(_buttons[_players[0].selection].tex, transform);
+                    break;
+                case kPaper:
+                case kScissors:
+                    render_draw_quad(_buttons[_players[0].selection].tex, -x, y, 100.0f, 100.0f);
+                    break;
+                default:
+                    break;
+            }
+
+            switch(_players[1].selection) {
+                case kRock:
+                    transform = GLKMatrix4Multiply(GLKMatrix4MakeScale(100.0f, 100.0f, 1.0f), GLKMatrix4MakeZRotation(percent*3.5f));
+                    transform = GLKMatrix4Multiply(GLKMatrix4MakeTranslation(x, y, 0.0f), transform);
+                    render_draw_quad_transform(_buttons[_players[1].selection].tex, transform);
+                    break;
+                case kPaper:
+                case kScissors:
+                    render_draw_quad(_buttons[_players[1].selection].tex, x, y, 100.0f, 100.0f);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+    }
     render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
     for(ii=0;ii<_num_buttons;++ii) {
         if(_buttons[ii].weapon == _players[0].selection)
-            render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
-        else            
-            render_set_color(1.0f, 1.0f, 1.0f, 0.75f);
+            render_set_color(1.0f, 0.9f, 0.9f, 1.0f);
+        else
+            render_set_color(1.0f, 1.0f, 1.0f, 0.65f);
         render_draw_quad(_buttons[ii].tex,
                          _buttons[ii].x,
                          _buttons[ii].y,
@@ -194,9 +250,10 @@ void game_shutdown(game_t* game) {
 }
 void game_handle_tap(game_t* game, float x, float y) {
     int ii;
+    if(game->round_state != kRoundPicking)
+        return;
     x -= _width/2;
     y = -y + _height/2;
-    printf("X: %f\tY: %f\n", x, y);
 
     for (ii=0; ii<_num_buttons; ++ii) {
         float l = _buttons[ii].x - _buttons[ii].scale/2;

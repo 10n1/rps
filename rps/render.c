@@ -262,6 +262,13 @@ void render_draw_fullscreen_quad(void)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
 }
+void render_draw_quad_transform(GLuint texture, GLKMatrix4 transform) {    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, transform.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glBindVertexArrayOES(_meshes[MESH_QUAD]);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+}
 void render_draw_quad(GLuint texture, float x, float y, float width, float height)
 {
     render_draw_custom_quad(texture, _meshes[MESH_QUAD], x, y, width, height);

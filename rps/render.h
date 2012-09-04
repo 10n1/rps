@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
+#include <GLKit/GLKMath.h>
 
 enum {
     ATTRIB_POSITION,
@@ -33,6 +34,7 @@ GLuint render_create_texture(const char* filename);
 
 void render_set_color(float r, float g, float b, float a);
 void render_draw_quad(GLuint texture, float x, float y, float width, float height);
+void render_draw_quad_transform(GLuint texture, GLKMatrix4 transform);
 void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height);
 void render_draw_fullscreen_quad(void);
 void render_resize(float width, float height);
