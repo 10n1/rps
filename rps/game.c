@@ -49,7 +49,7 @@ static void _print_scores(void) {
     else
         render_set_color(1.0f, 0.0f, 0.0f, 1.0f);        
     sprintf(buffer, "%s: %d", _players[0].name, _players[0].score);
-    draw_text_formatted(buffer, kJustifyLeft, _height/2-(128*scale), scale);
+    text_draw_formatted(buffer, kJustifyLeft, _height/2-(128*scale), scale);
 
     
     if(_players[1].score > _players[0].score)
@@ -59,7 +59,7 @@ static void _print_scores(void) {
     else
         render_set_color(1.0f, 0.0f, 0.0f, 1.0f);
     sprintf(buffer, "%s: %d", _players[1].name, _players[1].score);
-    draw_text_formatted(buffer, kJustifyRight, _height/2-(128*scale), scale);
+    text_draw_formatted(buffer, kJustifyRight, _height/2-(128*scale), scale);
 }
 static void _print_timer(float f) {
     char buffer[128];
@@ -77,7 +77,7 @@ static void _print_timer(float f) {
         sprintf(buffer, "Scissors!");
     else
         sprintf(buffer, "Shoot!");
-    draw_text_formatted(buffer, kJustifyCenter, 0.0f, opacity + 1.0f);
+    text_draw_formatted(buffer, kJustifyCenter, 0.0f, opacity + 1.0f);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -95,7 +95,7 @@ External
 void game_initialize(game_t* game, float width, float height) {
     int ii;
     game->initialized = 1;
-    load_font();
+    font_load();
     /* GL setup */
     render_init();
     _buttons[0].tex = render_create_texture("assets/rock.png");

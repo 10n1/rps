@@ -91,7 +91,7 @@ static GLuint           _char_meshes[256] = {0};
 /*
  * External
  */
-void load_font(void) {
+void font_load(void) {
     int ii, jj;
     uint8_t header[4];
     FILE* file = fopen(system_get_path("assets/andika.fnt"), "rb");
@@ -196,7 +196,7 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
     }
     return NULL;
 }
-void draw_text(const char* text, float x, float y, float size) {
+void text_draw(const char* text, float x, float y, float size) {
     const char* orig_text = text;
     float draw_x = x;
     float draw_y = y;
@@ -217,7 +217,7 @@ void draw_text(const char* text, float x, float y, float size) {
             y -= _font_common.lineHeight*size;
     }
 }
-void draw_text_formatted(const char* text, text_justification_t justify, float y, float size)
+void text_draw_formatted(const char* text, text_justification_t justify, float y, float size)
 {
     const char* orig_text = text;
     float draw_x = 0.0f;

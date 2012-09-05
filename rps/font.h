@@ -15,9 +15,9 @@ typedef enum {
     kJustifyRight
 } text_justification_t;
 
-void load_font(void);
-void draw_text(const char* text, float x, float y, float size);
-void draw_text_formatted(const char* text, text_justification_t justify, float y, float size);
+void font_load(void);
+void text_draw(const char* text, float x, float y, float size);
+void text_draw_formatted(const char* text, text_justification_t justify, float y, float size);
 
 /* @} */
 #endif /* include guard */
