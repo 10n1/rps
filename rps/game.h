@@ -11,9 +11,9 @@
 #include <OpenGLES/ES2/gl.h>
 #include "timer.h"
 
-#ifdef __cplusplus
-extern "C" { // Use C linkage
-#endif
+typedef struct game_t game_t;
+typedef struct player_t player_t;
+typedef struct game_state_t game_state_t;
 
 typedef enum {
     kRoundStart,
@@ -30,15 +30,29 @@ typedef enum {
     kInvalid = -1
 } weapon_t;
 
-typedef struct {
-    Timer timer;
-    float delta_time;
-    int initialized;
-    float round_timer;
-    round_state_t round_state;
-    round_state_t prev_state;
-    float results_timer;
-} game_t;
+struct game_state_t {
+    void (*on_enter)(game_t* game);
+    void (*on_update)(game_t* game);
+    void (*on_render)(game_t* game);
+    void (*on_exit)(game_t* game);
+};
+
+struct player_t {
+    char name[128];
+    weapon_t selection;
+    int score;
+};
+
+struct game_t {
+    Timer           timer;
+    float           delta_time;
+    int             initialized;
+    float           round_timer;
+    round_state_t   round_state;
+    round_state_t   prev_state;
+    float           results_timer;
+    player_t        players[2];
+};
 
 void game_initialize(game_t* game, float width, float height);
 void game_update(game_t* game);
@@ -48,9 +62,5 @@ void game_pause(game_t* game);
 void game_resume(game_t* game);
 
 void game_handle_tap(game_t* game, float x, float y);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* include guard */

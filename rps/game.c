@@ -22,8 +22,6 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static float _width     = 0;
-static float _height    = 0;
 static struct {
     GLuint tex;
     float x;
@@ -32,34 +30,30 @@ static struct {
     weapon_t weapon;
 } _buttons[16] = {0};
 static int _num_buttons = 0;
-static struct {
-    char name[128];
-    weapon_t selection;
-    int score;
-} _players[2] = {0};
 static GLuint _sheet_texture = 0;
 
-static void _print_scores(void) {
+static void _print_scores(game_t* game) {
     char buffer[256];
+    float height = get_device_height();
     float scale = 0.35f;
-    if(_players[0].score > _players[1].score)
+    if(game->players[0].score > game->players[1].score)
         render_set_color(0.0f, 1.0f, 0.0f, 1.0f);
-    else if(_players[0].score == _players[1].score)
+    else if(game->players[0].score == game->players[1].score)
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
     else
         render_set_color(1.0f, 0.0f, 0.0f, 1.0f);        
-    sprintf(buffer, "%s: %d", _players[0].name, _players[0].score);
-    text_draw_formatted(buffer, kJustifyLeft, _height/2-(128*scale), scale);
+    sprintf(buffer, "%s: %d", game->players[0].name, game->players[0].score);
+    text_draw_formatted(buffer, kJustifyLeft, height/2-(128*scale), scale);
 
     
-    if(_players[1].score > _players[0].score)
+    if(game->players[1].score > game->players[0].score)
         render_set_color(0.0f, 1.0f, 0.0f, 1.0f);
-    else if(_players[0].score == _players[1].score)
+    else if(game->players[0].score == game->players[1].score)
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
     else
         render_set_color(1.0f, 0.0f, 0.0f, 1.0f);
-    sprintf(buffer, "%s: %d", _players[1].name, _players[1].score);
-    text_draw_formatted(buffer, kJustifyRight, _height/2-(128*scale), scale);
+    sprintf(buffer, "%s: %d", game->players[1].name, game->players[1].score);
+    text_draw_formatted(buffer, kJustifyRight, height/2-(128*scale), scale);
 }
 static void _print_timer(float f) {
     char buffer[128];
@@ -111,8 +105,6 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[2].scale = 25.0f;
     _buttons[2].weapon = kScissors;
     _num_buttons = 3;
-    _width = width;
-    _height = height;
     render_resize(width, height);
     
     for(ii=0;ii<_num_buttons;++ii) {
@@ -123,9 +115,9 @@ void game_initialize(game_t* game, float width, float height) {
     }
     _sheet_texture = render_create_texture("assets/sheet.png");
     timer_init(&game->timer);
-    sprintf(_players[0].name, "Player");
-    sprintf(_players[1].name, "Computer");
-    _players[0].selection = _players[1].selection = kInvalid;
+    sprintf(game->players[0].name, "Player");
+    sprintf(game->players[1].name, "Computer");
+    game->players[0].selection = game->players[1].selection = kInvalid;
     game->round_timer = 4.0f;
     game->round_state = kRoundStart;
     //srand((uint32_t)game->timer.start_time);
@@ -142,7 +134,7 @@ void game_update(game_t* game) {
             game->round_state = kRoundPicking;
             break;
         case kRoundPicking:
-            _players[1].selection = _get_computer_move();
+            game->players[1].selection = _get_computer_move();
             if(game->round_timer < 0.0f) {
                 game->round_state = kRoundResults;
                 game->results_timer = 3.0f;
@@ -151,30 +143,30 @@ void game_update(game_t* game) {
         case kRoundResults: {
             static int begin = 1;
             if(begin) {
-                switch(_players[0].selection) {
+                switch(game->players[0].selection) {
                     case kRock:
-                        if(_players[1].selection == kPaper) {
-                            ++_players[1].score;
-                        } else if(_players[1].selection == kScissors) {
-                            ++_players[0].score;
+                        if(game->players[1].selection == kPaper) {
+                            ++game->players[1].score;
+                        } else if(game->players[1].selection == kScissors) {
+                            ++game->players[0].score;
                         }
                         break;
                     case kPaper:
-                        if(_players[1].selection == kScissors) {
-                            ++_players[1].score;
-                        } else if(_players[1].selection == kRock) {
-                            ++_players[0].score;
+                        if(game->players[1].selection == kScissors) {
+                            ++game->players[1].score;
+                        } else if(game->players[1].selection == kRock) {
+                            ++game->players[0].score;
                         }
                         break;
                     case kScissors:
-                        if(_players[1].selection == kRock) {
-                            ++_players[1].score;
-                        } else if(_players[1].selection == kPaper) {
-                            ++_players[0].score;
+                        if(game->players[1].selection == kRock) {
+                            ++game->players[1].score;
+                        } else if(game->players[1].selection == kPaper) {
+                            ++game->players[0].score;
                         }
                         break;
                     default:
-                        ++_players[1].score;
+                        ++game->players[1].score;
                         break;
                 }
                 begin = 0;
@@ -192,7 +184,7 @@ void game_render(game_t* game) {
     int ii;
     render_prepare();
 
-    _print_scores();
+    _print_scores(game);
     switch(game->round_state) {
         case kPause:
             return;
@@ -209,11 +201,11 @@ void game_render(game_t* game) {
             y = 0.0f;
             render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
 
-            switch(_players[0].selection) {
+            switch(game->players[0].selection) {
                 case kRock:
                     transform = GLKMatrix4Multiply(GLKMatrix4MakeScale(100.0f, 100.0f, 1.0f), GLKMatrix4MakeZRotation(-percent*3.5f));
                     transform = GLKMatrix4Multiply(GLKMatrix4MakeTranslation(-x, y, 0.0f), transform);
-                    render_draw_quad_transform(_buttons[_players[0].selection].tex, transform);
+                    render_draw_quad_transform(_buttons[game->players[0].selection].tex, transform);
                     break;
                 case kPaper:
                     percent = (3.0f-game->results_timer)/3.0f;
@@ -221,7 +213,7 @@ void game_render(game_t* game) {
                     render_draw_quad(_sheet_texture, -x, y, 100.0f, 100.0f);
                     break;
                 case kScissors:
-                    render_draw_quad(_buttons[_players[0].selection].tex, -x, y, 100.0f, 100.0f);
+                    render_draw_quad(_buttons[game->players[0].selection].tex, -x, y, 100.0f, 100.0f);
                     break;
                 default:
                     break;
@@ -229,15 +221,15 @@ void game_render(game_t* game) {
 
             percent = (3.0f-game->results_timer)/3.0f;
             x = lerp(get_device_width()/2, 0.0f, percent);
-            switch(_players[1].selection) {
+            switch(game->players[1].selection) {
                 case kRock:
                     transform = GLKMatrix4Multiply(GLKMatrix4MakeScale(100.0f, 100.0f, 1.0f), GLKMatrix4MakeZRotation(percent*3.5f));
                     transform = GLKMatrix4Multiply(GLKMatrix4MakeTranslation(x, y, 0.0f), transform);
-                    render_draw_quad_transform(_buttons[_players[1].selection].tex, transform);
+                    render_draw_quad_transform(_buttons[game->players[1].selection].tex, transform);
                     break;
                 case kPaper:
                 case kScissors:
-                    render_draw_quad(_buttons[_players[1].selection].tex, x, y, 100.0f, 100.0f);
+                    render_draw_quad(_buttons[game->players[1].selection].tex, x, y, 100.0f, 100.0f);
                     break;
                 default:
                     break;
@@ -247,7 +239,7 @@ void game_render(game_t* game) {
     }
     render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
     for(ii=0;ii<_num_buttons;++ii) {
-        if(_buttons[ii].weapon == _players[0].selection)
+        if(_buttons[ii].weapon == game->players[0].selection)
             render_set_color(1.0f, 0.9f, 0.9f, 1.0f);
         else
             render_set_color(1.0f, 1.0f, 1.0f, 0.65f);
@@ -265,8 +257,8 @@ void game_handle_tap(game_t* game, float x, float y) {
     int ii;
     if(game->round_state != kRoundPicking)
         return;
-    x -= _width/2;
-    y = -y + _height/2;
+    x -= get_device_width()/2;
+    y = -y + get_device_height()/2;
 
     for (ii=0; ii<_num_buttons; ++ii) {
         float l = _buttons[ii].x - _buttons[ii].scale/2;
@@ -275,7 +267,7 @@ void game_handle_tap(game_t* game, float x, float y) {
         float t = _buttons[ii].y + _buttons[ii].scale/2;
         if(x > l && x <= r && y > b && y <= t)
         {
-            _players[0].selection = _buttons[ii].weapon;
+            game->players[0].selection = _buttons[ii].weapon;
             break;
         }
     }
