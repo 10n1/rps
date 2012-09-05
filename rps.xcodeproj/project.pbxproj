@@ -24,6 +24,10 @@
 		27A0C17B15ACDACD000BA591 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27A0C17A15ACDACD000BA591 /* ViewController.m */; };
 		27A0C17E15ACDACD000BA591 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17C15ACDACD000BA591 /* ViewController_iPhone.xib */; };
 		27A0C18115ACDACD000BA591 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17F15ACDACD000BA591 /* ViewController_iPad.xib */; };
+		27AB688C15F70A5400AC0E63 /* iPhoneLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688615F7099100AC0E63 /* iPhoneLogo.png */; };
+		27AB688D15F70A5600AC0E63 /* iPhoneLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */; };
+		27AB688E15F70A5900AC0E63 /* iPadLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688415F7099100AC0E63 /* iPadLogo.png */; };
+		27AB688F15F70A5C00AC0E63 /* iPadLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688515F7099100AC0E63 /* iPadLogo@2x.png */; };
 		27D51E4515F3E5E9002EECE6 /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 27D51E4315F3E5E9002EECE6 /* font.c */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +43,7 @@
 		2772A22115F470650074077F /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		277A362D15AEA244009A067D /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		277A362F15AEA37B009A067D /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
-		27A0C15B15ACDACD000BA591 /* rps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rps.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27A0C15B15ACDACD000BA591 /* RPS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RPS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A0C15F15ACDACD000BA591 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		27A0C16115ACDACD000BA591 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		27A0C16315ACDACD000BA591 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -54,6 +58,10 @@
 		27A0C17A15ACDACD000BA591 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		27A0C17D15ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		27A0C18015ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
+		27AB688415F7099100AC0E63 /* iPadLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPadLogo.png; sourceTree = "<group>"; };
+		27AB688515F7099100AC0E63 /* iPadLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPadLogo@2x.png"; sourceTree = "<group>"; };
+		27AB688615F7099100AC0E63 /* iPhoneLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhoneLogo.png; sourceTree = "<group>"; };
+		27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPhoneLogo@2x.png"; sourceTree = "<group>"; };
 		27D51E4315F3E5E9002EECE6 /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
 		27D51E4415F3E5E9002EECE6 /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,6 +85,10 @@
 		27A0C15015ACDACD000BA591 = {
 			isa = PBXGroup;
 			children = (
+				27AB688415F7099100AC0E63 /* iPadLogo.png */,
+				27AB688515F7099100AC0E63 /* iPadLogo@2x.png */,
+				27AB688615F7099100AC0E63 /* iPhoneLogo.png */,
+				27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */,
 				2730F63715D64E680058A89B /* assets */,
 				27A0C16915ACDACD000BA591 /* rps */,
 				27A0C15E15ACDACD000BA591 /* Frameworks */,
@@ -87,7 +99,7 @@
 		27A0C15C15ACDACD000BA591 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				27A0C15B15ACDACD000BA591 /* rps.app */,
+				27A0C15B15ACDACD000BA591 /* RPS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -143,9 +155,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		27A0C15A15ACDACD000BA591 /* rps */ = {
+		27A0C15A15ACDACD000BA591 /* RPS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "rps" */;
+			buildConfigurationList = 27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPS" */;
 			buildPhases = (
 				27A0C15715ACDACD000BA591 /* Sources */,
 				27A0C15815ACDACD000BA591 /* Frameworks */,
@@ -155,9 +167,9 @@
 			);
 			dependencies = (
 			);
-			name = rps;
+			name = RPS;
 			productName = rps;
-			productReference = 27A0C15B15ACDACD000BA591 /* rps.app */;
+			productReference = 27A0C15B15ACDACD000BA591 /* RPS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -180,7 +192,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				27A0C15A15ACDACD000BA591 /* rps */,
+				27A0C15A15ACDACD000BA591 /* RPS */,
 			);
 		};
 /* End PBXProject section */
@@ -194,6 +206,10 @@
 				27A0C17E15ACDACD000BA591 /* ViewController_iPhone.xib in Resources */,
 				27A0C18115ACDACD000BA591 /* ViewController_iPad.xib in Resources */,
 				2730F63815D64E680058A89B /* assets in Resources */,
+				27AB688C15F70A5400AC0E63 /* iPhoneLogo.png in Resources */,
+				27AB688D15F70A5600AC0E63 /* iPhoneLogo@2x.png in Resources */,
+				27AB688E15F70A5900AC0E63 /* iPadLogo.png in Resources */,
+				27AB688F15F70A5C00AC0E63 /* iPadLogo@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,7 +379,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "rps" */ = {
+		27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27A0C18515ACDACD000BA591 /* Debug */,
