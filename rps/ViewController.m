@@ -21,7 +21,6 @@
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;
-    game_t _game;
 }
 @property (strong, nonatomic) EAGLContext *context;
 
@@ -33,6 +32,7 @@
 @implementation ViewController
 
 @synthesize context = _context;
+@synthesize game = _game;
 
 - (void)viewDidLoad
 {
@@ -53,8 +53,6 @@
     
     [self setupGL];
     
-    game_initialize(&_game, get_device_width(), get_device_height());
-    
     tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tap.numberOfTapsRequired = 1;
     [[self view] addGestureRecognizer:tap];
@@ -64,7 +62,7 @@
     CGPoint tapPoint = [sender locationInView:nil];
     tapPoint.x *= get_device_scale();
     tapPoint.y *= get_device_scale();
-    game_handle_tap(&_game, tapPoint.x, tapPoint.y);
+    game_handle_tap(_game, tapPoint.x, tapPoint.y);
 }
 - (void)viewDidUnload
 {    
@@ -77,7 +75,7 @@
     }
 	self.context = nil;
     
-    game_shutdown(&_game);
+    game_shutdown(_game);
 }
 
 - (void)didReceiveMemoryWarning
@@ -109,12 +107,12 @@
 
 - (void)update
 {
-    game_update(&_game);
+    game_update(_game);
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    game_render(&_game);
+    game_render(_game);
 }
 
 @end

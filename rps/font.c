@@ -237,11 +237,11 @@ void draw_text_formatted(const char* text, text_justification_t justify, float y
             break;
         }
         case kJustifyLeft: {
-            draw_x = -get_device_width()/2;
+            draw_x = -get_device_width()/2 + 2*get_device_scale();
             break;
         }
         default:
-            draw_x = get_device_width()/2-total_width;
+            draw_x = get_device_width()/2-total_width - 2*get_device_scale();
             break;
     }
     while(text && *text) {

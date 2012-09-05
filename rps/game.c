@@ -77,7 +77,7 @@ static void _print_timer(float f) {
         sprintf(buffer, "Scissors!");
     else
         sprintf(buffer, "Shoot!");
-    draw_text_formatted(buffer, kJustifyCenter, 0.0f, opacity*2.0f + 1.0f);
+    draw_text_formatted(buffer, kJustifyCenter, 0.0f, opacity + 1.0f);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -135,6 +135,8 @@ void game_update(game_t* game) {
     game->round_timer -= game->delta_time;
     game->results_timer -= game->delta_time;
     switch(game->round_state) {
+        case kPause:
+            return;
         case kRoundStart:
             game->round_timer = 4.0f;
             game->round_state = kRoundPicking;
@@ -192,6 +194,8 @@ void game_render(game_t* game) {
 
     _print_scores();
     switch(game->round_state) {
+        case kPause:
+            return;
         case kRoundStart:
             break;
         case kRoundPicking:
@@ -275,4 +279,12 @@ void game_handle_tap(game_t* game, float x, float y) {
             break;
         }
     }
+}
+void game_pause(game_t* game) {
+    game->prev_state = game->round_state;
+    game->round_state = kPause;
+}
+void game_resume(game_t* game) {
+    timer_reset(&game->timer);
+    game->round_state = game->prev_state;
 }

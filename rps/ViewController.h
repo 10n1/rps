@@ -9,7 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
 
+#include "game.h"
+
 @interface ViewController : GLKViewController
+
+@property game_t* game;
 
 @end
 

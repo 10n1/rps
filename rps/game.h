@@ -18,7 +18,8 @@ extern "C" { // Use C linkage
 typedef enum {
     kRoundStart,
     kRoundPicking,
-    kRoundResults
+    kRoundResults,
+    kPause
 } round_state_t;
 
 typedef enum {
@@ -35,6 +36,7 @@ typedef struct {
     int initialized;
     float round_timer;
     round_state_t round_state;
+    round_state_t prev_state;
     float results_timer;
 } game_t;
 
@@ -42,6 +44,8 @@ void game_initialize(game_t* game, float width, float height);
 void game_update(game_t* game);
 void game_render(game_t* game);
 void game_shutdown(game_t* game);
+void game_pause(game_t* game);
+void game_resume(game_t* game);
 
 void game_handle_tap(game_t* game, float x, float y);
 
