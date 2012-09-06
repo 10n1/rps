@@ -62,6 +62,11 @@
     CGPoint tapPoint = [sender locationInView:nil];
     tapPoint.x *= get_device_scale();
     tapPoint.y *= get_device_scale();
+    if([[UIDevice currentDevice] orientation] == UIInterfaceOrientationPortraitUpsideDown) {
+        // The OS should really rotate the taps for us :-(
+        tapPoint.y = get_device_height() - tapPoint.y;
+        tapPoint.x = get_device_width() - tapPoint.x;
+    }
     game_handle_tap(_game, tapPoint.x, tapPoint.y);
 }
 - (void)viewDidUnload
@@ -86,11 +91,13 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
-    } else {
+    // No landscape for us!
+    if(interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown ||
+       interfaceOrientation == UIInterfaceOrientationPortrait )
+    {
         return YES;
     }
+    return NO;
 }
 
 - (void)setupGL

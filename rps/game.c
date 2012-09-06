@@ -120,7 +120,6 @@ void game_initialize(game_t* game, float width, float height) {
     game->players[0].selection = game->players[1].selection = kInvalid;
     game->round_timer = 4.0f;
     game->round_state = kRoundStart;
-    //srand((uint32_t)game->timer.start_time);
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
