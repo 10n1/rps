@@ -59,10 +59,6 @@ typedef struct {
 } bmfont_common_t;
 
 typedef struct {
-    char    pageNames[128][8];
-} bmfont_pages_t;
-
-typedef struct {
     uint32_t    id;
     uint16_t    x;
     uint16_t    y;
@@ -82,11 +78,12 @@ typedef struct {
 } bmfont_kerning_pairs_t;
 #pragma pack(pop)
 
-static GLuint   _font_texture = 0;
+static GLuint           _font_textures[16] = {0};
 static bmfont_info_t    _font_info = {0};
 static bmfont_common_t  _font_common = {0};
 static bmfont_char_t    _font_chars[256] = {0};
 static GLuint           _char_meshes[256] = {0};
+static int              _char_textures[256] = {0};
 
 /*
  * External
@@ -114,11 +111,19 @@ void font_load(void) {
                 break;
             }
         case kBMFontPagesBlock: {
-                char font_texture[256];
-                bmfont_pages_t pages;
-                fread(&pages, type.size, 1, file);
-                sprintf(font_texture, "assets/%s", pages.pageNames[0]);
-                _font_texture = render_create_texture(font_texture);
+                char font_texture[256] = {0};
+                char pagenames[1024] = {0};
+                const char* curr_pagename = pagenames;
+                int ii=0;
+                fread(&pagenames, type.size, 1, file);
+                while(strlen(curr_pagename))
+                {
+                    sprintf(font_texture, "assets/%s", curr_pagename);
+                    _font_textures[ii++] = render_create_texture(font_texture);
+                    while(*curr_pagename != '\0')
+                        ++curr_pagename;
+                    ++curr_pagename;
+                }
                 break;
             }
         case kBMFontCharsBlock: {
@@ -127,8 +132,6 @@ void font_load(void) {
                 for(ii=0; ii<num_chars; ++ii) {
                     bmfont_char_t character;
                     fread(&character, sizeof(character), 1, file);
-                    if(character.id == 'A')
-                        _font_chars[character.id] = character;
                     _font_chars[character.id] = character;
                 }
                 break;
@@ -176,6 +179,8 @@ void font_load(void) {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
         
         glBindVertexArrayOES(0);
+
+        _char_textures[ii] = _font_textures[c.page];
     }
 }
 static const char* _draw_line(const char* text, float x, float y, float size) {
@@ -186,7 +191,7 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
             return text+1;
         }
         if(c != ' ') {
-            render_draw_custom_quad(_font_texture, _char_meshes[c],
+            render_draw_custom_quad(_char_textures[c], _char_meshes[c],
                                     x+glyph.xoffset*size,
                                     y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
                                     size, size);
@@ -223,6 +228,7 @@ void text_draw_formatted(const char* text, text_justification_t justify, float y
     float draw_x = 0.0f;
     float draw_y = y;
     float total_width = 0;
+    size *= 0.5f;
     size *= get_device_scale()/2;
     while(text && *text) {
         char c = *text;
