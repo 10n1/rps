@@ -47,6 +47,7 @@ struct game_t {
     float           speed;
     player_t        player;
     game_state_t    state;
+    float           pause_timer;
 };
 
 void game_initialize(game_t* game, float width, float height);

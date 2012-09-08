@@ -119,10 +119,17 @@ void game_initialize(game_t* game, float width, float height) {
     _white_texture = render_create_texture("assets/white.png");
 }
 void game_update(game_t* game) {
+    game->delta_time = (float)timer_delta_time(&game->timer);
+    if(game->state == kPause)
+        return;
+
+    if(game->pause_timer > 0.0f) {
+        game->pause_timer -= game->delta_time;
+        return;
+    }
+    
     game->speed = 1.0f + (game->player.score/10)*0.2f;
     game->speed = max(game->speed, 0.1f);
-    
-    game->delta_time = (float)timer_delta_time(&game->timer);
     game->current_weapon.timer -= (game->delta_time*game->speed);
     if(game->current_weapon.timer <= 0.0f) {
         if(_get_winner(game->player.selection, game->current_weapon.weapon) == 1)
@@ -165,6 +172,15 @@ void game_render(game_t* game) {
         render_draw_fullscreen_quad();
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
         text_draw_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+    } else if(game->pause_timer > 0.0f) {
+        char buffer[32];
+        sprintf(buffer, "%.1f", game->pause_timer);
+        render_set_color(0.0f, 0.0f, 0.0f, 0.5f);
+        glBindTexture(GL_TEXTURE_2D, _white_texture);
+        render_draw_fullscreen_quad();
+        render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+        text_draw_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+        text_draw_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
     }
 }
 void game_shutdown(game_t* game) {
@@ -188,8 +204,9 @@ void game_handle_tap(game_t* game, float x, float y) {
     }
 }
 void game_pause(game_t* game) {
-    //game->state = kPause;
+    game->state = kPause;
+    game->pause_timer = 3.0f;
 }
 void game_resume(game_t* game) {
-    //game->state = kGame;
+    game->state = kGame;
 }
