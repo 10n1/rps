@@ -36,13 +36,16 @@ static void _print_scores(game_t* game) {
     char buffer[256];
     float height = get_device_height();
     float scale = 0.8f;
-    if(game->player.score > 0.0f)
+    if(game->player.score > 0.0f) {
         render_set_color(0.0f, 0.8f, 0.0f, 1.0f);
-    else if(game->player.score < 0.0f)
+        sprintf(buffer, "%c%d",'+', game->player.score);
+    } else if(game->player.score < 0.0f) {
         render_set_color(0.8f, 0.0f, 0.0f, 1.0f);
-    else
+        sprintf(buffer, "%d", game->player.score);
+    } else {
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
-    sprintf(buffer, "%c%d", (game->player.score >= 0) ? '+' : '-', game->player.score);
+        sprintf(buffer, "%d", game->player.score);
+    }
     text_draw_formatted(buffer, kJustifyCenter, height/2-(128*scale), scale);
 }
 static weapon_t _get_computer_move(void) {
@@ -115,8 +118,11 @@ void game_initialize(game_t* game, float width, float height) {
     game->current_weapon.timer = 2.0f;
 }
 void game_update(game_t* game) {
+    game->speed = 1.0f + (game->player.score/10)*0.2f;
+    game->speed = max(game->speed, 0.1f);
+    
     game->delta_time = (float)timer_delta_time(&game->timer);
-    game->current_weapon.timer -= game->delta_time;
+    game->current_weapon.timer -= (game->delta_time*game->speed);
     if(game->current_weapon.timer <= 0.0f) {
         if(_get_winner(game->player.selection, game->current_weapon.weapon) == 1)
             game->player.score += 1;
