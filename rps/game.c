@@ -35,7 +35,7 @@ static GLuint _white_texture = 0;
 static void _print_scores(game_t* game) {
     char buffer[256];
     float height = get_device_height();
-    float scale = 0.8f;
+    float scale = 1.0f;
     if(game->player.score > 0.0f) {
         render_set_color(0.0f, 0.8f, 0.0f, 1.0f);
         sprintf(buffer, "%c%d",'+', game->player.score);
@@ -46,7 +46,7 @@ static void _print_scores(game_t* game) {
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
-    text_draw_formatted(buffer, kJustifyCenter, height/2-(128*scale), scale);
+    text_draw_formatted(buffer, kJustifyCenter, height/2-(font_size()*scale), scale);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -101,22 +101,28 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
     _buttons[2].weapon = kScissors;
-    _num_buttons = 3;
+    _buttons[3].tex = render_create_texture("assets/pause.png");
+    _buttons[3].x = -width/2 + 50.0f;
+    _buttons[3].y = height/2 - 50.0f;
+    _buttons[3].scale = 50.0f;
+    _num_buttons = 4;
     render_resize(width, height);
 
-    for(ii=0;ii<_num_buttons;++ii) {
+    for(ii=0;ii<3;++ii) {
         float scale = width/3;
         _buttons[ii].scale = scale;
         _buttons[ii].x = ii*scale - width/2 + scale/2;
         _buttons[ii].y = -height/2 + scale/2;
     }
-    timer_init(&game->timer);
     game->player.selection = kInvalid;
     game->current_weapon.weapon = _get_computer_move();
     game->current_weapon.timer = 2.0f;
     game->state = kPause;
 
     _white_texture = render_create_texture("assets/white.png");
+
+    timer_init(&game->timer);
+    srand((int32_t)game->timer.start_time);
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
@@ -197,10 +203,19 @@ void game_handle_tap(game_t* game, float x, float y) {
         float t = _buttons[ii].y + _buttons[ii].scale/2;
         if(x > l && x <= r && y > b && y <= t)
         {
-            game->player.selection = _buttons[ii].weapon;
+            if(ii < 3)
+                game->player.selection = _buttons[ii].weapon;
+            else if(ii == 3)
+                game_toggle_pause(game);
             break;
         }
     }
+}
+void game_toggle_pause(game_t* game) {
+    if(game->state == kPause)
+        game_resume(game);
+    else
+        game_pause(game);
 }
 void game_pause(game_t* game) {
     game->state = kPause;

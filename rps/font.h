@@ -16,6 +16,7 @@ typedef enum {
 } text_justification_t;
 
 void font_load(void);
+int font_size(void);
 void text_draw(const char* text, float x, float y, float size);
 void text_draw_formatted(const char* text, text_justification_t justify, float y, float size);
 

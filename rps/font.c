@@ -256,3 +256,6 @@ void text_draw_formatted(const char* text, text_justification_t justify, float y
             y -= _font_common.lineHeight*size;
     }
 }
+int font_size(void) {
+    return _font_common.lineHeight * (int)get_device_scale()/4;
+}

@@ -56,6 +56,7 @@ void game_render(game_t* game);
 void game_shutdown(game_t* game);
 void game_pause(game_t* game);
 void game_resume(game_t* game);
+void game_toggle_pause(game_t* game);
 
 void game_handle_tap(game_t* game, float x, float y);
 
