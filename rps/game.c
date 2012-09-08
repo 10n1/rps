@@ -30,7 +30,7 @@ static struct {
     weapon_t weapon;
 } _buttons[16] = {0};
 static int _num_buttons = 0;
-static GLuint _sheet_texture = 0;
+static GLuint _white_texture = 0;
 
 static void _print_scores(game_t* game) {
     char buffer[256];
@@ -110,12 +110,13 @@ void game_initialize(game_t* game, float width, float height) {
         _buttons[ii].x = ii*scale - width/2 + scale/2;
         _buttons[ii].y = -height/2 + scale/2;
     }
-    _sheet_texture = render_create_texture("assets/sheet.png");
     timer_init(&game->timer);
     game->player.selection = kInvalid;
-    game->speed = 0.5f;
     game->current_weapon.weapon = _get_computer_move();
     game->current_weapon.timer = 2.0f;
+    game->state = kPause;
+
+    _white_texture = render_create_texture("assets/white.png");
 }
 void game_update(game_t* game) {
     game->speed = 1.0f + (game->player.score/10)*0.2f;
@@ -157,6 +158,14 @@ void game_render(game_t* game) {
                          _buttons[ii].scale,
                          _buttons[ii].scale);
     }
+
+    if(game->state == kPause) {
+        render_set_color(0.0f, 0.0f, 0.0f, 0.5f);
+        glBindTexture(GL_TEXTURE_2D, _white_texture);
+        render_draw_fullscreen_quad();
+        render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+        text_draw_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+    }
 }
 void game_shutdown(game_t* game) {
     game->initialized = 0;
@@ -179,10 +188,8 @@ void game_handle_tap(game_t* game, float x, float y) {
     }
 }
 void game_pause(game_t* game) {
-    game->prev_state = game->round_state;
-    game->round_state = kPause;
+    //game->state = kPause;
 }
 void game_resume(game_t* game) {
-    timer_reset(&game->timer);
-    game->round_state = game->prev_state;
+    //game->state = kGame;
 }

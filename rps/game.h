@@ -16,12 +16,9 @@ typedef struct player_t player_t;
 typedef float float2[2];
 
 typedef enum {
-    kRoundStart,
-    kRoundPicking,
-    kRoundResults,
     kPause,
     kGame
-} round_state_t;
+} game_state_t;
 
 typedef enum {
     kRock = 0,
@@ -48,9 +45,8 @@ struct game_t {
     note_t          current_weapon;
     float2          current_position;
     float           speed;
-    round_state_t   round_state;
-    round_state_t   prev_state;
     player_t        player;
+    game_state_t    state;
 };
 
 void game_initialize(game_t* game, float width, float height);
