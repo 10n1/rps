@@ -79,6 +79,28 @@ static weapon_t _get_computer_move(void) {
 static float lerp(float a, float b, float t) {
     return a + t*(b-a);
 }
+static int _get_winner(weapon_t player_one, weapon_t player_two) {
+    switch(player_one) {
+        case kRock:
+            if(player_two == kPaper)
+                return 2;
+            else if(player_two == kScissors)
+                return 1;
+        case kPaper:
+            if(player_two == kScissors)
+                return 2;
+            else if(player_two == kRock)
+                return 1;
+        case kScissors:
+            if(player_two == kRock)
+                return 2;
+            else if(player_two == kPaper)
+                return 1;
+        default:
+            return 2;
+    }
+    return 0;
+}
 
 /* Paper and Scissors: http://www.Clker.com */
 /* Rock: http://opengameart.org/content/rocks */
@@ -142,32 +164,11 @@ void game_update(game_t* game) {
         case kRoundResults: {
             static int begin = 1;
             if(begin) {
-                switch(game->players[0].selection) {
-                    case kRock:
-                        if(game->players[1].selection == kPaper) {
-                            ++game->players[1].score;
-                        } else if(game->players[1].selection == kScissors) {
-                            ++game->players[0].score;
-                        }
-                        break;
-                    case kPaper:
-                        if(game->players[1].selection == kScissors) {
-                            ++game->players[1].score;
-                        } else if(game->players[1].selection == kRock) {
-                            ++game->players[0].score;
-                        }
-                        break;
-                    case kScissors:
-                        if(game->players[1].selection == kRock) {
-                            ++game->players[1].score;
-                        } else if(game->players[1].selection == kPaper) {
-                            ++game->players[0].score;
-                        }
-                        break;
-                    default:
-                        ++game->players[1].score;
-                        break;
-                }
+                int winner = _get_winner(game->players[0].selection, game->players[1].selection);
+                if(winner == 1)
+                    game->players[0].score++;
+                else if(winner == 2)
+                    game->players[1].score++;
                 begin = 0;
             } else {
                 if(game->results_timer < 0.0f) {

@@ -10,10 +10,10 @@
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
 #include "timer.h"
+#include "game_states.h"
 
 typedef struct game_t game_t;
 typedef struct player_t player_t;
-typedef struct game_state_t game_state_t;
 
 typedef enum {
     kRoundStart,
@@ -30,13 +30,6 @@ typedef enum {
     kInvalid = -1
 } weapon_t;
 
-struct game_state_t {
-    void (*on_enter)(game_t* game);
-    void (*on_update)(game_t* game);
-    void (*on_render)(game_t* game);
-    void (*on_exit)(game_t* game);
-};
-
 struct player_t {
     char name[128];
     weapon_t selection;
@@ -52,6 +45,7 @@ struct game_t {
     round_state_t   prev_state;
     float           results_timer;
     player_t        players[2];
+    game_state_t*   current_state;
 };
 
 void game_initialize(game_t* game, float width, float height);

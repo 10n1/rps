@@ -24,6 +24,7 @@
 		27A0C17B15ACDACD000BA591 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27A0C17A15ACDACD000BA591 /* ViewController.m */; };
 		27A0C17E15ACDACD000BA591 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17C15ACDACD000BA591 /* ViewController_iPhone.xib */; };
 		27A0C18115ACDACD000BA591 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 27A0C17F15ACDACD000BA591 /* ViewController_iPad.xib */; };
+		27A4EAD115F85C4F00D2907F /* game_states.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A4EACF15F85C4F00D2907F /* game_states.c */; };
 		27AB688C15F70A5400AC0E63 /* iPhoneLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688615F7099100AC0E63 /* iPhoneLogo.png */; };
 		27AB688D15F70A5600AC0E63 /* iPhoneLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */; };
 		27AB688E15F70A5900AC0E63 /* iPadLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688415F7099100AC0E63 /* iPadLogo.png */; };
@@ -58,6 +59,8 @@
 		27A0C17A15ACDACD000BA591 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		27A0C17D15ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		27A0C18015ACDACD000BA591 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
+		27A4EACF15F85C4F00D2907F /* game_states.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = game_states.c; sourceTree = "<group>"; };
+		27A4EAD015F85C4F00D2907F /* game_states.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = game_states.h; sourceTree = "<group>"; };
 		27AB688415F7099100AC0E63 /* iPadLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPadLogo.png; sourceTree = "<group>"; };
 		27AB688515F7099100AC0E63 /* iPadLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPadLogo@2x.png"; sourceTree = "<group>"; };
 		27AB688615F7099100AC0E63 /* iPhoneLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhoneLogo.png; sourceTree = "<group>"; };
@@ -138,6 +141,8 @@
 				27D51E4315F3E5E9002EECE6 /* font.c */,
 				27D51E4415F3E5E9002EECE6 /* font.h */,
 				27A0C16A15ACDACD000BA591 /* Supporting Files */,
+				27A4EACF15F85C4F00D2907F /* game_states.c */,
+				27A4EAD015F85C4F00D2907F /* game_states.h */,
 			);
 			path = rps;
 			sourceTree = "<group>";
@@ -229,6 +234,7 @@
 				275405CD15AF262900B85F9F /* stb_image.c in Sources */,
 				27D51E4515F3E5E9002EECE6 /* font.c in Sources */,
 				2772A22215F470650074077F /* timer.c in Sources */,
+				27A4EAD115F85C4F00D2907F /* game_states.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
