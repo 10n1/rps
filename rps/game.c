@@ -103,7 +103,7 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[2].weapon = kScissors;
     _num_buttons = 3;
     render_resize(width, height);
-    
+
     for(ii=0;ii<_num_buttons;++ii) {
         float scale = width/3;
         _buttons[ii].scale = scale;
@@ -138,7 +138,6 @@ void game_update(game_t* game) {
             game->player.score -= 1;
         game->current_weapon.weapon = _get_computer_move();
         game->current_weapon.timer = 2.0f;
-        game->player.selection = kInvalid;
     }
 }
 void game_render(game_t* game) {
@@ -150,8 +149,8 @@ void game_render(game_t* game) {
     render_draw_quad(_buttons[game->current_weapon.weapon].tex,
                      lerp(-get_device_width()/2, get_device_width()/2, 1-(game->current_weapon.timer/2.0f)),
                      0.0f,
-                     150.0f,
-                     150.0f);
+                     75.0f*get_device_scale(),
+                     75.0f*get_device_scale());
 
     render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
     for(ii=0;ii<_num_buttons;++ii) {
@@ -209,4 +208,5 @@ void game_pause(game_t* game) {
 }
 void game_resume(game_t* game) {
     game->state = kGame;
+    timer_init(&game->timer);
 }

@@ -40,6 +40,7 @@
     GLKView *view = nil;
     
     [super viewDidLoad];
+    self.preferredFramesPerSecond = 60;
     
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
