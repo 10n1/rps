@@ -22,10 +22,11 @@ typedef enum {
 } game_state_t;
 
 typedef enum {
-    kRock = 0,
-    kPaper = 1,
-    kScissors = 2,
+    kRock,
+    kPaper,
+    kScissors,
 
+    kNumWeapons,
     kInvalid = -1
 } weapon_t;
 
@@ -49,6 +50,7 @@ struct game_t {
     player_t        player;
     game_state_t    state;
     float           pause_timer;
+    button_t*       weapon_buttons[kNumWeapons];
 };
 
 void game_initialize(game_t* game, float width, float height);

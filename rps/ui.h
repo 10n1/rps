@@ -11,6 +11,18 @@
 
 #include "render.h"
 
+typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} color_t;
+
+static const color_t kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+static const color_t KRed =   {1.0f, 0.0f, 0.0f, 1.0f};
+static const color_t kGreen = {0.0f, 1.0f, 0.0f, 1.0f};
+static const color_t kBlue =  {0.0f, 0.0f, 1.0f, 1.0f};
+
 typedef enum {
     kJustifyLeft,
     kJustifyCenter,
@@ -33,7 +45,7 @@ typedef struct {
     float width;
     float height;
     int active;
-    float color[4];
+    color_t color;
     ui_callback_t*  callback;
     ui_param_t      params[4];
 } button_t;

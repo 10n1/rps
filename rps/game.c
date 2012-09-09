@@ -23,15 +23,8 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static struct {
-    GLuint tex;
-    float x;
-    float y;
-    float scale;
-    weapon_t weapon;
-} _buttons[16] = {0};
-static int _num_buttons = 0;
 static GLuint _white_texture = 0;
+static GLuint _weapon_textures[kNumWeapons] = {0};
 
 static void _print_scores(game_t* game) {
     char buffer[256];
@@ -47,7 +40,7 @@ static void _print_scores(game_t* game) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
-    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-(ui_text_size()*scale), scale);
+    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-64, scale);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -80,6 +73,13 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
 static void _player_selection(ui_param_t* p) {
     game_t* game = p[0].ptr;
     weapon_t weapon = p[1].i;
+    int ii;
+    for(ii=0;ii<kNumWeapons;++ii) {
+        if(ii == weapon)
+            game->weapon_buttons[ii]->color = KRed;
+        else
+            game->weapon_buttons[ii]->color = kWhite;
+    }
     game->player.selection = weapon;
 }
 
@@ -95,33 +95,17 @@ void game_initialize(game_t* game, float width, float height) {
     /* GL setup */
     render_init();
     ui_init();
-    _buttons[0].tex = render_create_texture("assets/rock.png");
-    _buttons[0].x = -0.25f;
-    _buttons[0].scale = 0.25f;
-    _buttons[0].weapon = kRock;
-    _buttons[1].tex = render_create_texture("assets/paper.png");
-    _buttons[1].x = 0.0f;
-    _buttons[1].scale = 0.25f;
-    _buttons[1].weapon = kPaper;
-    _buttons[2].tex = render_create_texture("assets/scissors.png");
-    _buttons[2].x = 0.25f;
-    _buttons[2].scale = 25.0f;
-    _buttons[2].weapon = kScissors;
-    _num_buttons = 2;
     render_resize(width, height);
-
-    for(ii=0;ii<3;++ii) {
-        float scale = width/3;
-        _buttons[ii].scale = scale;
-        _buttons[ii].x = ii*scale - width/2 + scale/2;
-        _buttons[ii].y = -height/2 + scale/2;
-    }
+    
     game->player.selection = kInvalid;
     game->current_weapon.weapon = _get_computer_move();
     game->current_weapon.timer = 2.0f;
     game->state = kPause;
 
     _white_texture = render_create_texture("assets/white.png");
+    _weapon_textures[kRock] = render_create_texture("assets/rock.png");
+    _weapon_textures[kPaper] = render_create_texture("assets/paper.png");
+    _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
     button = ui_create_button_texture(render_create_texture("assets/pause.png"),
                                       -width/2 + 50.0f,
@@ -131,14 +115,18 @@ void game_initialize(game_t* game, float width, float height) {
     button->callback = (ui_callback_t*)game_toggle_pause;
     button->params[0].ptr = game;
 
-    button = ui_create_button_texture(render_create_texture("assets/scissors.png"),
-                                      (2*width/3)-width/2 + width/6,
-                                      -height/2 + width/6,
-                                      width/3,
-                                      width/3);
-    button->callback = _player_selection;
-    button->params[0].ptr = game;
-    button->params[1].i = kScissors;
+    for(ii=0;ii<kNumWeapons;++ii) {
+        float button_size = width/kNumWeapons;
+        button = ui_create_button_texture(_weapon_textures[ii],
+                                          (ii*button_size)-width/2 + button_size/2,
+                                          -height/2 + button_size/2,
+                                          button_size,
+                                          button_size);
+        button->callback = _player_selection;
+        button->params[0].ptr = game;
+        button->params[1].i = (weapon_t)ii;
+        game->weapon_buttons[ii] = button;
+    }
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -167,30 +155,17 @@ void game_update(game_t* game) {
     }
 }
 void game_render(game_t* game) {
-    int ii;
     render_prepare();
 
     _print_scores(game);
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
-    render_draw_quad(_buttons[game->current_weapon.weapon].tex,
+    render_draw_quad(_weapon_textures[game->current_weapon.weapon],
                      lerp(-get_device_width()/2, get_device_width()/2, 1-(game->current_weapon.timer/2.0f)),
                      0.0f,
                      75.0f*get_device_scale(),
                      75.0f*get_device_scale());
 
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
-    for(ii=0;ii<_num_buttons;++ii) {
-        if(_buttons[ii].weapon == game->player.selection)
-            render_set_colorf(1.0f, 0.9f, 0.9f, 1.0f);
-        else
-            render_set_colorf(1.0f, 1.0f, 1.0f, 0.65f);
-        render_draw_quad(_buttons[ii].tex,
-                         _buttons[ii].x,
-                         _buttons[ii].y,
-                         _buttons[ii].scale,
-                         _buttons[ii].scale);
-    }
-
     if(game->state == kPause) {
         render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
         glBindTexture(GL_TEXTURE_2D, _white_texture);
@@ -214,23 +189,7 @@ void game_shutdown(game_t* game) {
     game->initialized = 0;
 }
 void game_handle_tap(game_t* game, float x, float y) {
-    int ii;
     ui_tap(x, y);
-    x -= get_device_width()/2;
-    y = -y + get_device_height()/2;
-
-    for (ii=0; ii<_num_buttons; ++ii) {
-        float l = _buttons[ii].x - _buttons[ii].scale/2;
-        float r = _buttons[ii].x + _buttons[ii].scale/2;
-        float b = _buttons[ii].y - _buttons[ii].scale/2;
-        float t = _buttons[ii].y + _buttons[ii].scale/2;
-        if(x > l && x <= r && y > b && y <= t)
-        {
-            if(ii < 3)
-                game->player.selection = _buttons[ii].weapon;
-            break;
-        }
-    }
 }
 void game_toggle_pause(ui_param_t* p) {
     game_t* game = p[0].ptr;

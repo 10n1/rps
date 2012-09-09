@@ -6,7 +6,7 @@ fontName=TitilliumText22L Rg
 fontFile=
 charSet=0
 fontSize=128
-aa=1
+aa=4
 scaleH=100
 useSmoothing=1
 isBold=0
@@ -16,7 +16,7 @@ disableBoxChars=1
 outputInvalidCharGlyph=0
 dontIncludeKerningPairs=0
 useHinting=1
-renderFromOutline=0
+renderFromOutline=1
 useClearType=1
 
 # character alignment

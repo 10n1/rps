@@ -88,6 +88,7 @@ static GLuint           _char_meshes[256] = {0};
 static int              _char_textures[256] = {0};
 static button_t         _buttons[256] = {0};
 static int              _num_buttons = 0;
+static float            _scale = 0.0f;
 
 static void _load_font(const char* filename) {
     int ii, jj;
@@ -143,6 +144,7 @@ static void _load_font(const char* filename) {
     } while(!feof(file) && !ferror(file));
     fclose(file);
 
+    _scale = 64.0f/_font_common.lineHeight;
     for(ii=0;ii<256;++ii) {
         bmfont_char_t c = _font_chars[ii];
         vertex_t quad_vertices[] =
@@ -210,7 +212,7 @@ void ui_init(void) {
     _load_font("assets/andika.fnt");
 }
 void ui_draw_text(const char* text, float x, float y, float size) {
-    size *= get_device_scale()/2;
+    size *= _scale * get_device_scale()/2;
     while(text && *text) {
         text = _draw_line(text, x, y, size);
         if(text)
@@ -222,7 +224,7 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
     float draw_x = 0.0f;
     float draw_y = y;
     float total_width = 0;
-    size *= get_device_scale()/2;
+    size *= _scale * get_device_scale()/2;
     while(text && *text) {
         char c = *text;
         bmfont_char_t glyph = _font_chars[c];
@@ -250,7 +252,7 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
     }
 }
 int ui_text_size(void) {
-    return _font_common.lineHeight * (int)get_device_scale()/2;
+    return _font_common.lineHeight * (int)(get_device_scale()/2 * _scale);
 }
 //button_t* ui_create_button_text(const char* text, float width, float height, float x, float y) {
 //    button_t* button = &_buttons[_num_buttons++];
@@ -270,7 +272,7 @@ button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, fl
     button->width = width;
     button->height = height;
     button->active = 1;
-    button->color[0] = button->color[1] = button->color[2] = button->color[3] = 1.0f;
+    button->color.r = button->color.g = button->color.b = button->color.a = 1.0f;
     return button;
 }
 void ui_render(void) {
@@ -280,7 +282,7 @@ void ui_render(void) {
         if(!button->active)
             continue;
 
-        render_set_colorfv(button->color);
+        render_set_colorfv((float*)&button->color);
         if(button->text) {
         } else {
             render_draw_quad(button->tex,
