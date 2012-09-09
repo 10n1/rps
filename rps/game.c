@@ -26,10 +26,17 @@ Internal
 static GLuint _white_texture = 0;
 static GLuint _weapon_textures[kNumWeapons] = {0};
 
+static int _weapon_table[kNumWeapons][kNumWeapons] =
+{     //   R   P   S  
+/* R */ {  0, -1, +1 },
+/* P */ { +1,  0, -1 },
+/* S */ { -1, +1,  0 },
+};
+
 static void _print_scores(game_t* game) {
     char buffer[256];
     float height = get_device_height();
-    float scale = 1.0f;
+    float scale = 2.0f;
     if(game->player.score > 0.0f) {
         render_set_colorf(0.0f, 0.8f, 0.0f, 1.0f);
         sprintf(buffer, "%c%d",'+', game->player.score);
@@ -40,7 +47,7 @@ static void _print_scores(game_t* game) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
-    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-64, scale);
+    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-64*scale, scale);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -49,26 +56,10 @@ static float lerp(float a, float b, float t) {
     return a + t*(b-a);
 }
 static int _get_winner(weapon_t player_one, weapon_t player_two) {
-    switch(player_one) {
-        case kRock:
-            if(player_two == kPaper)
-                return 2;
-            else if(player_two == kScissors)
-                return 1;
-        case kPaper:
-            if(player_two == kScissors)
-                return 2;
-            else if(player_two == kRock)
-                return 1;
-        case kScissors:
-            if(player_two == kRock)
-                return 2;
-            else if(player_two == kPaper)
-                return 1;
-        default:
-            return 2;
-    }
-    return 0;
+    int result = _weapon_table[player_one][player_two];
+    if(player_one == kInvalid)
+        return -1;
+    return result;
 }
 static void _player_selection(ui_param_t* p) {
     game_t* game = p[0].ptr;
@@ -108,10 +99,10 @@ void game_initialize(game_t* game, float width, float height) {
     _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
     button = ui_create_button_texture(render_create_texture("assets/pause.png"),
-                                      -width/2 + 50.0f,
-                                      height/2 - 50.0f,
-                                      50.0f,
-                                      50.0f);
+                                      -width/2 + 75.0f,
+                                      height/2 - 75.0f,
+                                      75.0f,
+                                      75.0f);
     button->callback = (ui_callback_t*)game_toggle_pause;
     button->params[0].ptr = game;
 
@@ -146,10 +137,7 @@ void game_update(game_t* game) {
     game->speed = max(game->speed, 0.1f);
     game->current_weapon.timer -= (game->delta_time*game->speed);
     if(game->current_weapon.timer <= 0.0f) {
-        if(_get_winner(game->player.selection, game->current_weapon.weapon) == 1)
-            game->player.score += 1;
-        else
-            game->player.score -= 1;
+        game->player.score += _get_winner(game->player.selection, game->current_weapon.weapon);
         game->current_weapon.weapon = _get_computer_move();
         game->current_weapon.timer = 2.0f;
     }
@@ -166,6 +154,8 @@ void game_render(game_t* game) {
                      75.0f*get_device_scale());
 
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
+    ui_render();
+    
     if(game->state == kPause) {
         render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
         glBindTexture(GL_TEXTURE_2D, _white_texture);
@@ -182,8 +172,6 @@ void game_render(game_t* game) {
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
         ui_draw_text_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
     }
-
-    ui_render();
 }
 void game_shutdown(game_t* game) {
     game->initialized = 0;
