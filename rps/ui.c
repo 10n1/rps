@@ -306,7 +306,7 @@ void ui_tap(float x, float y) {
         t = _buttons[ii].y + _buttons[ii].height/2;
         if(x > l && x <= r && y > b && y <= t)
         {
-            _buttons[ii].callback(_buttons[ii].userdata);
+            _buttons[ii].callback(_buttons[ii].params);
             break;
         }
     }

@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
 #include "timer.h"
+#include "ui.h"
 
 typedef struct game_t game_t;
 typedef struct player_t player_t;
@@ -56,7 +57,7 @@ void game_render(game_t* game);
 void game_shutdown(game_t* game);
 void game_pause(game_t* game);
 void game_resume(game_t* game);
-void game_toggle_pause(game_t* game);
+void game_toggle_pause(ui_param_t* params);
 
 void game_handle_tap(game_t* game, float x, float y);
 

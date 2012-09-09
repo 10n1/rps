@@ -17,7 +17,13 @@ typedef enum {
     kJustifyRight
 } ui_justify_t;
 
-typedef void (ui_callback_t)(void*);
+typedef union {
+    void* ptr;
+    intptr_t i;
+    float f;
+    const char* str;
+} ui_param_t;
+typedef void (ui_callback_t)(ui_param_t*);
 
 typedef struct {
     const char* text;
@@ -29,7 +35,7 @@ typedef struct {
     int active;
     float color[4];
     ui_callback_t*  callback;
-    void*           userdata;
+    ui_param_t      params[4];
 } button_t;
 
 void ui_init(void);

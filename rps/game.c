@@ -132,7 +132,7 @@ void game_initialize(game_t* game, float width, float height) {
                                       50.0f,
                                       50.0f);
     button->callback = (ui_callback_t*)game_toggle_pause;
-    button->userdata = game;
+    button->params[0].ptr = game;
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -222,13 +222,12 @@ void game_handle_tap(game_t* game, float x, float y) {
         {
             if(ii < 3)
                 game->player.selection = _buttons[ii].weapon;
-            else if(ii == 3)
-                game_toggle_pause(game);
             break;
         }
     }
 }
-void game_toggle_pause(game_t* game) {
+void game_toggle_pause(ui_param_t* p) {
+    game_t* game = p[0].ptr;
     if(game->state == kPause)
         game_resume(game);
     else
