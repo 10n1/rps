@@ -18,7 +18,8 @@ typedef float float2[2];
 
 typedef enum {
     kPause,
-    kGame
+    kGame,
+    kMainMenu
 } game_state_t;
 
 typedef enum {
@@ -50,6 +51,7 @@ struct game_t {
     player_t        player;
     game_state_t    state;
     float           pause_timer;
+    button_t*       pause_button;
     button_t*       weapon_buttons[kNumWeapons];
 };
 

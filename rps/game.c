@@ -82,7 +82,7 @@ External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game, float width, float height) {
     int ii;
-    button_t* button;
+    float scale;
     /* GL setup */
     render_init();
     ui_init();
@@ -98,16 +98,18 @@ void game_initialize(game_t* game, float width, float height) {
     _weapon_textures[kPaper] = render_create_texture("assets/paper.png");
     _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
-    button = ui_create_button_texture(render_create_texture("assets/pause.png"),
-                                      -width/2 + 75.0f,
-                                      height/2 - 75.0f,
-                                      75.0f,
-                                      75.0f);
-    button->callback = (ui_callback_t*)game_toggle_pause;
-    button->params[0].ptr = game;
+    scale = 40.0f*get_device_scale();
+    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
+                                      -width/2 + scale,
+                                      height/2 - scale,
+                                      scale,
+                                      scale);
+    game->pause_button->callback = (ui_callback_t*)game_toggle_pause;
+    game->pause_button->params[0].ptr = game;
 
     for(ii=0;ii<kNumWeapons;++ii) {
         float button_size = width/kNumWeapons;
+        button_t* button;
         button = ui_create_button_texture(_weapon_textures[ii],
                                           (ii*button_size)-width/2 + button_size/2,
                                           -height/2 + button_size/2,
@@ -187,10 +189,14 @@ void game_toggle_pause(ui_param_t* p) {
         game_pause(game);
 }
 void game_pause(game_t* game) {
+    if(game->state == kMainMenu)
+        return;
     game->state = kPause;
     game->pause_timer = 3.0f;
 }
 void game_resume(game_t* game) {
+    if(game->state == kMainMenu)
+        return;
     game->state = kGame;
     timer_init(&game->timer);
 }
