@@ -1,17 +1,18 @@
-/*! @file font.c
+/*! @file ui.c
  *  @author Kyle Weicht
- *  @date 9/2/12
+ *  @date 9/8/12
  *  @copyright Copyright (c) 2012 Kyle Weicht. All rights reserved.
  */
-#include "font.h"
+#include "ui.h"
 
 #include <stdio.h>
-
-#include "system.h"
+#include <stdint.h>
 #include "render.h"
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#include "system.h"
 
-extern float get_device_scale(void);
+/*
+ * Internal 
+ */
 
 /*
  * Internal 
@@ -85,13 +86,10 @@ static bmfont_char_t    _font_chars[256] = {0};
 static GLuint           _char_meshes[256] = {0};
 static int              _char_textures[256] = {0};
 
-/*
- * External
- */
-void _font_load(void) {
+static void _load_font(const char* filename) {
     int ii, jj;
     uint8_t header[4];
-    FILE* file = fopen(system_get_path("assets/andika.fnt"), "rb");
+    FILE* file = fopen(system_get_path(filename), "rb");
     fread(header, sizeof(header), 1, file);
     if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
         fclose(file);
@@ -201,34 +199,26 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
     }
     return NULL;
 }
-void _text_draw(const char* text, float x, float y, float size) {
-    const char* orig_text = text;
-    float draw_x = x;
-    float draw_y = y;
-    float total_width = 0;
+
+/*
+ * External
+ */
+void ui_init(void) {
+    _load_font("assets/andika.fnt");
+}
+void ui_draw_text(const char* text, float x, float y, float size) {
     size *= get_device_scale()/2;
-    while(text && *text) {
-        char c = *text;
-        bmfont_char_t glyph = _font_chars[c];
-        total_width += glyph.xadvance * size;
-        ++text;
-    }
-    draw_x -= total_width/2;
-    draw_y = y;
-    text = orig_text;
     while(text && *text) {
         text = _draw_line(text, x, y, size);
         if(text)
             y -= _font_common.lineHeight*size;
     }
 }
-void _text_draw_formatted(const char* text, text_justification_t justify, float y, float size)
-{
+void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, float size) {
     const char* orig_text = text;
     float draw_x = 0.0f;
     float draw_y = y;
     float total_width = 0;
-    size *= 0.5f;
     size *= get_device_scale()/2;
     while(text && *text) {
         char c = *text;
@@ -256,6 +246,6 @@ void _text_draw_formatted(const char* text, text_justification_t justify, float 
             y -= _font_common.lineHeight*size;
     }
 }
-int _font_size(void) {
-    return _font_common.lineHeight * (int)get_device_scale()/4;
+int ui_text_size(void) {
+    return _font_common.lineHeight * (int)get_device_scale()/2;
 }

@@ -11,6 +11,8 @@
 #include <OpenGLES/ES2/gl.h>
 #include <GLKit/GLKMath.h>
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 enum {
     ATTRIB_POSITION,
     ATTRIB_TEXCOORD,

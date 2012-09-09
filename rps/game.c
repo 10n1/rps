@@ -11,7 +11,8 @@
 
 #include "system.h"
 #include "render.h"
-#include "font.h"
+//#include "font.h"
+#include "ui.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -46,7 +47,7 @@ static void _print_scores(game_t* game) {
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
-    text_draw_formatted(buffer, kJustifyCenter, height/2-(font_size()*scale), scale);
+    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-(ui_text_size()*scale), scale);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
@@ -85,10 +86,9 @@ External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game, float width, float height) {
     int ii;
-    game->initialized = 1;
-    font_load();
     /* GL setup */
     render_init();
+    ui_init();
     _buttons[0].tex = render_create_texture("assets/rock.png");
     _buttons[0].x = -0.25f;
     _buttons[0].scale = 0.25f;
@@ -123,6 +123,7 @@ void game_initialize(game_t* game, float width, float height) {
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
+    game->initialized = 1;
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
@@ -176,7 +177,7 @@ void game_render(game_t* game) {
         glBindTexture(GL_TEXTURE_2D, _white_texture);
         render_draw_fullscreen_quad();
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
-        text_draw_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+        ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
     } else if(game->pause_timer > 0.0f) {
         char buffer[32];
         sprintf(buffer, "%.1f", game->pause_timer);
@@ -184,8 +185,8 @@ void game_render(game_t* game) {
         glBindTexture(GL_TEXTURE_2D, _white_texture);
         render_draw_fullscreen_quad();
         render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
-        text_draw_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
-        text_draw_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
+        ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+        ui_draw_text_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
     }
 }
 void game_shutdown(game_t* game) {
