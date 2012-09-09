@@ -135,7 +135,7 @@ void game_update(game_t* game) {
         return;
     }
     
-    game->speed = 1.0f + (game->player.score/10)*0.2f;
+    game->speed = 1/((get_device_width()/get_device_scale())/320) + (game->player.score/10)*0.2f;
     game->speed = max(game->speed, 0.1f);
     game->current_weapon.timer -= (game->delta_time*game->speed);
     if(game->current_weapon.timer <= 0.0f) {
