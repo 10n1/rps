@@ -77,13 +77,10 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
     }
     return 0;
 }
-static void test_callback(void* p) {
-    static int x = 0;
-    if(x)
-        ((button_t*)p)->color[1] = 1.0f;
-    else
-        ((button_t*)p)->color[1] = 0.0f;
-    x = !x;
+static void _player_selection(ui_param_t* p) {
+    game_t* game = p[0].ptr;
+    weapon_t weapon = p[1].i;
+    game->player.selection = weapon;
 }
 
 /* Paper and Scissors: http://www.Clker.com */
@@ -110,7 +107,7 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
     _buttons[2].weapon = kScissors;
-    _num_buttons = 3;
+    _num_buttons = 2;
     render_resize(width, height);
 
     for(ii=0;ii<3;++ii) {
@@ -133,6 +130,15 @@ void game_initialize(game_t* game, float width, float height) {
                                       50.0f);
     button->callback = (ui_callback_t*)game_toggle_pause;
     button->params[0].ptr = game;
+
+    button = ui_create_button_texture(render_create_texture("assets/scissors.png"),
+                                      (2*width/3)-width/2 + width/6,
+                                      -height/2 + width/6,
+                                      width/3,
+                                      width/3);
+    button->callback = _player_selection;
+    button->params[0].ptr = game;
+    button->params[1].i = kScissors;
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
