@@ -28,7 +28,6 @@
 		27AB688D15F70A5600AC0E63 /* iPhoneLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */; };
 		27AB688E15F70A5900AC0E63 /* iPadLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688415F7099100AC0E63 /* iPadLogo.png */; };
 		27AB688F15F70A5C00AC0E63 /* iPadLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 27AB688515F7099100AC0E63 /* iPadLogo@2x.png */; };
-		27D51E4515F3E5E9002EECE6 /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 27D51E4315F3E5E9002EECE6 /* font.c */; };
 		27E6816C15FC5EC800871DBC /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E6816A15FC5EC800871DBC /* ui.c */; };
 /* End PBXBuildFile section */
 
@@ -63,8 +62,6 @@
 		27AB688515F7099100AC0E63 /* iPadLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPadLogo@2x.png"; sourceTree = "<group>"; };
 		27AB688615F7099100AC0E63 /* iPhoneLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhoneLogo.png; sourceTree = "<group>"; };
 		27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPhoneLogo@2x.png"; sourceTree = "<group>"; };
-		27D51E4315F3E5E9002EECE6 /* font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = font.c; sourceTree = "<group>"; };
-		27D51E4415F3E5E9002EECE6 /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
 		27E6816A15FC5EC800871DBC /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		27E6816B15FC5EC800871DBC /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -138,8 +135,6 @@
 				27169E4915AF175300617BE7 /* game.c */,
 				27169E4B15AF1AE800617BE7 /* system.h */,
 				27169E4C15AF1B2800617BE7 /* system_ios.m */,
-				27D51E4315F3E5E9002EECE6 /* font.c */,
-				27D51E4415F3E5E9002EECE6 /* font.h */,
 				27A0C16A15ACDACD000BA591 /* Supporting Files */,
 				27E6816A15FC5EC800871DBC /* ui.c */,
 				27E6816B15FC5EC800871DBC /* ui.h */,
@@ -232,7 +227,6 @@
 				27169E4A15AF175300617BE7 /* game.c in Sources */,
 				27169E4D15AF1B2800617BE7 /* system_ios.m in Sources */,
 				275405CD15AF262900B85F9F /* stb_image.c in Sources */,
-				27D51E4515F3E5E9002EECE6 /* font.c in Sources */,
 				2772A22215F470650074077F /* timer.c in Sources */,
 				27E6816C15FC5EC800871DBC /* ui.c in Sources */,
 			);

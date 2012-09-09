@@ -11,11 +11,11 @@
 #include "system.h"
 
 /*
- * Internal 
+ * Internal
  */
 
 /*
- * Internal 
+ * Internal
  */
 enum {
     kBMFontInfoBlock = 1,
@@ -24,6 +24,7 @@ enum {
     kBMFontCharsBlock = 4,
     kBMFontKerningBlock = 5
 };
+
 #pragma pack(push,1)
 typedef struct {
     uint8_t     type;
@@ -56,7 +57,7 @@ typedef struct {
     uint8_t     alphaChnl;
     uint8_t     redChnl;
     uint8_t     greenChnl;
-    uint8_t     blueChnl;    
+    uint8_t     blueChnl;
 } bmfont_common_t;
 
 typedef struct {
@@ -85,6 +86,8 @@ static bmfont_common_t  _font_common = {0};
 static bmfont_char_t    _font_chars[256] = {0};
 static GLuint           _char_meshes[256] = {0};
 static int              _char_textures[256] = {0};
+static button_t         _buttons[256] = {0};
+static int              _num_buttons = 0;
 
 static void _load_font(const char* filename) {
     int ii, jj;
@@ -95,7 +98,7 @@ static void _load_font(const char* filename) {
         fclose(file);
         return;
     }
-    
+
     do {
         bmfont_block_type_t type;
         fread(&type, sizeof(type), 1, file);
@@ -175,7 +178,7 @@ static void _load_font(const char* filename) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
-        
+
         glBindVertexArrayOES(0);
 
         _char_textures[ii] = _font_textures[c.page];
@@ -248,4 +251,63 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
 }
 int ui_text_size(void) {
     return _font_common.lineHeight * (int)get_device_scale()/2;
+}
+//button_t* ui_create_button_text(const char* text, float width, float height, float x, float y) {
+//    button_t* button = &_buttons[_num_buttons++];
+//    button->text = text;
+//    button->x = x;
+//    button->y = y;
+//    button->width = width;
+//    button->height = height;
+//    button->active = 1;
+//    return button;
+//}
+button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, float height) {
+    button_t* button = &_buttons[_num_buttons++];
+    button->tex = tex;
+    button->x = x;
+    button->y = y;
+    button->width = width;
+    button->height = height;
+    button->active = 1;
+    button->color[0] = button->color[1] = button->color[2] = button->color[3] = 1.0f;
+    return button;
+}
+void ui_render(void) {
+    int ii;
+    for(ii=0;ii<_num_buttons;++ii) {
+        button_t* button = _buttons + ii;
+        if(!button->active)
+            continue;
+
+        render_set_colorfv(button->color);
+        if(button->text) {
+        } else {
+            render_draw_quad(button->tex,
+                             button->x,
+                             button->y,
+                             button->width,
+                             button->height);
+        }
+    }
+}
+void ui_tap(float x, float y) {
+    int ii;
+    x -= get_device_width()/2;
+    y = -y + get_device_height()/2;
+
+    for (ii=0; ii<_num_buttons; ++ii) {
+        float l, r, b, t;
+        if(!_buttons[ii].active || !_buttons[ii].callback)
+            continue;
+        l = _buttons[ii].x - _buttons[ii].width/2;
+        r = _buttons[ii].x + _buttons[ii].width/2;
+        b = _buttons[ii].y - _buttons[ii].height/2;
+        t = _buttons[ii].y + _buttons[ii].height/2;
+        if(x > l && x <= r && y > b && y <= t)
+        {
+            _buttons[ii].callback(_buttons[ii].userdata);
+            break;
+        }
+    }
 }

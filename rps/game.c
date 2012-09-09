@@ -38,13 +38,13 @@ static void _print_scores(game_t* game) {
     float height = get_device_height();
     float scale = 1.0f;
     if(game->player.score > 0.0f) {
-        render_set_color(0.0f, 0.8f, 0.0f, 1.0f);
+        render_set_colorf(0.0f, 0.8f, 0.0f, 1.0f);
         sprintf(buffer, "%c%d",'+', game->player.score);
     } else if(game->player.score < 0.0f) {
-        render_set_color(0.8f, 0.0f, 0.0f, 1.0f);
+        render_set_colorf(0.8f, 0.0f, 0.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     } else {
-        render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+        render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
     ui_draw_text_formatted(buffer, kJustifyCenter, height/2-(ui_text_size()*scale), scale);
@@ -77,6 +77,14 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
     }
     return 0;
 }
+static void test_callback(void* p) {
+    static int x = 0;
+    if(x)
+        ((button_t*)p)->color[1] = 1.0f;
+    else
+        ((button_t*)p)->color[1] = 0.0f;
+    x = !x;
+}
 
 /* Paper and Scissors: http://www.Clker.com */
 /* Rock: http://opengameart.org/content/rocks */
@@ -86,6 +94,7 @@ External
 \*----------------------------------------------------------------------------*/
 void game_initialize(game_t* game, float width, float height) {
     int ii;
+    button_t* button;
     /* GL setup */
     render_init();
     ui_init();
@@ -101,11 +110,7 @@ void game_initialize(game_t* game, float width, float height) {
     _buttons[2].x = 0.25f;
     _buttons[2].scale = 25.0f;
     _buttons[2].weapon = kScissors;
-    _buttons[3].tex = render_create_texture("assets/pause.png");
-    _buttons[3].x = -width/2 + 50.0f;
-    _buttons[3].y = height/2 - 50.0f;
-    _buttons[3].scale = 50.0f;
-    _num_buttons = 4;
+    _num_buttons = 3;
     render_resize(width, height);
 
     for(ii=0;ii<3;++ii) {
@@ -120,6 +125,14 @@ void game_initialize(game_t* game, float width, float height) {
     game->state = kPause;
 
     _white_texture = render_create_texture("assets/white.png");
+
+    button = ui_create_button_texture(render_create_texture("assets/pause.png"),
+                                      -width/2 + 50.0f,
+                                      height/2 - 50.0f,
+                                      50.0f,
+                                      50.0f);
+    button->callback = (ui_callback_t*)game_toggle_pause;
+    button->userdata = game;
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -152,19 +165,19 @@ void game_render(game_t* game) {
     render_prepare();
 
     _print_scores(game);
-    render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+    render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     render_draw_quad(_buttons[game->current_weapon.weapon].tex,
                      lerp(-get_device_width()/2, get_device_width()/2, 1-(game->current_weapon.timer/2.0f)),
                      0.0f,
                      75.0f*get_device_scale(),
                      75.0f*get_device_scale());
 
-    render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+    render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     for(ii=0;ii<_num_buttons;++ii) {
         if(_buttons[ii].weapon == game->player.selection)
-            render_set_color(1.0f, 0.9f, 0.9f, 1.0f);
+            render_set_colorf(1.0f, 0.9f, 0.9f, 1.0f);
         else
-            render_set_color(1.0f, 1.0f, 1.0f, 0.65f);
+            render_set_colorf(1.0f, 1.0f, 1.0f, 0.65f);
         render_draw_quad(_buttons[ii].tex,
                          _buttons[ii].x,
                          _buttons[ii].y,
@@ -173,27 +186,30 @@ void game_render(game_t* game) {
     }
 
     if(game->state == kPause) {
-        render_set_color(0.0f, 0.0f, 0.0f, 0.5f);
+        render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
         glBindTexture(GL_TEXTURE_2D, _white_texture);
         render_draw_fullscreen_quad();
-        render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+        render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
     } else if(game->pause_timer > 0.0f) {
         char buffer[32];
         sprintf(buffer, "%.1f", game->pause_timer);
-        render_set_color(0.0f, 0.0f, 0.0f, 0.5f);
+        render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
         glBindTexture(GL_TEXTURE_2D, _white_texture);
         render_draw_fullscreen_quad();
-        render_set_color(1.0f, 1.0f, 1.0f, 1.0f);
+        render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
         ui_draw_text_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
     }
+
+    ui_render();
 }
 void game_shutdown(game_t* game) {
     game->initialized = 0;
 }
 void game_handle_tap(game_t* game, float x, float y) {
     int ii;
+    ui_tap(x, y);
     x -= get_device_width()/2;
     y = -y + get_device_height()/2;
 

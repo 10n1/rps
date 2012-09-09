@@ -288,9 +288,12 @@ void render_resize(float width, float height)
 {
     _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
 }
-void render_set_color(float r, float g, float b, float a)
+void render_set_colorf(float r, float g, float b, float a)
 {
     glUniform4f(_uniforms[UNIFORM_COLOR], r, g, b, a);
+}
+void render_set_colorfv(float* c) {
+    glUniform4fv(_uniforms[UNIFORM_COLOR], 1, c);
 }
 void render_prepare(void)
 {
