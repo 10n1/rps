@@ -64,6 +64,7 @@
 		27AB688715F7099100AC0E63 /* iPhoneLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iPhoneLogo@2x.png"; sourceTree = "<group>"; };
 		27E6816A15FC5EC800871DBC /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ui.c; sourceTree = "<group>"; };
 		27E6816B15FC5EC800871DBC /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
+		6D574CED15FEBE3600F274D6 /* rps_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rps_math.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +120,7 @@
 		27A0C16915ACDACD000BA591 /* rps */ = {
 			isa = PBXGroup;
 			children = (
+				6D574CED15FEBE3600F274D6 /* rps_math.h */,
 				2772A22015F470650074077F /* timer.c */,
 				2772A22115F470650074077F /* timer.h */,
 				275405CE15AF263A00B85F9F /* stb_image.h */,
