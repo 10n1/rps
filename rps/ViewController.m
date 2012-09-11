@@ -17,8 +17,6 @@
 @interface ViewController () {
     GLuint _program;
     
-    GLKMatrix4 _modelViewProjectionMatrix;
-    
     GLuint _vertexArray;
     GLuint _vertexBuffer;
 }
