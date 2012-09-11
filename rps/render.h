@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <OpenGLES/ES2/gl.h>
-#include <GLKit/GLKMath.h>
+#include "rps_math.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -45,7 +45,7 @@ void render_set_colorf(float r, float g, float b, float a);
 void render_set_colorfv(float* c);
 void render_set_projection_matrix(projection_type_t type);
 void render_draw_quad(GLuint texture, float x, float y, float width, float height);
-void render_draw_quad_transform(GLuint texture, GLKMatrix4 transform);
+void render_draw_quad_transform(GLuint texture, float4x4 transform);
 void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height);
 void render_draw_fullscreen_quad(void);
 void render_resize(float width, float height);
