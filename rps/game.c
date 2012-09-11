@@ -147,10 +147,12 @@ void game_update(game_t* game) {
     }
 }
 void game_render(game_t* game) {
+    GLKMatrix4 transform = GLKMatrix4MakeTranslation(0.0f, -0.2f, -10.0f);
     render_prepare();
 
     _print_scores(game);
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
+#if 0
     render_draw_quad(_weapon_textures[game->current_weapon.weapon],
                      lerp(-get_device_width()/2-game->weapon_buttons[0]->width/2,
                            get_device_width()/2+game->weapon_buttons[0]->width/2,
@@ -158,7 +160,18 @@ void game_render(game_t* game) {
                      0.0f,
                      75.0f*get_device_scale(),
                      75.0f*get_device_scale());
-
+#else
+    transform.m32 = lerp(-40.0f,
+                         -3.0f,
+                          1-(game->current_weapon.timer/kBaseWeaponTimer));
+    transform.m31 = lerp( 4.0f,
+                         -0.2f,
+                          1-(game->current_weapon.timer/kBaseWeaponTimer));
+    render_set_colorf(1.0f, 1.0f, 1.0f, lerp(1.0f, 0.0f, 1-(game->current_weapon.timer/0.25f)) );
+    render_set_projection_matrix(kPerspective);
+    render_draw_quad_transform(_weapon_textures[game->current_weapon.weapon], transform);
+    render_set_projection_matrix(kOrthographic);
+#endif
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     ui_render();
     
