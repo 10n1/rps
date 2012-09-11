@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 #include "render.h"
 #include "system.h"
 
