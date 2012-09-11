@@ -4,14 +4,14 @@
  *  @date 7/12/12
  *  @copyright Copyright (c) 2012 Kyle Weicht. All rights reserved.
  */
+#include "game.h"
+
 #include <stddef.h>
-#include <stdio.h>
+#include <GLKit/GLKMath.h>
 
 #include "system.h"
 #include "render.h"
 #include "ui.h"
-#include "game.h"
-
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 

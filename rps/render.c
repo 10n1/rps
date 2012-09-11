@@ -4,14 +4,14 @@
  *  @date 7/11/12
  *  @copyright Copyright (c) 2012 Kyle Weicht. All rights reserved.
  */
+#include "render.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "rps_math.h"
+#include <GLKit/GLKMath.h>
 #include "stb_image.h"
 #include "system.h"
-#include "render.h"
-
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 extern void CNSLog(const char* format,...);
@@ -78,8 +78,7 @@ enum {
 };
 
 static GLuint               _character_meshes[256] = {0};
-//static GLKMatrix4           _projectionMatrix[kNumProjectionTypes];
-static float4x4             _projectionMatrix[kNumProjectionTypes];
+static GLKMatrix4           _projectionMatrix[kNumProjectionTypes];
 static GLuint               _program = 0;
 static GLuint               _meshes[NUM_MESHES] = {0};
 static GLint                _uniforms[NUM_UNIFORMS] = {-1};
@@ -262,18 +261,15 @@ void render_set_projection_matrix(projection_type_t type) {
 }
 void render_draw_fullscreen_quad(void)
 {
-    float4x4 mIdentity = float4x4identity();
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mIdentity);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&mIdentity);
-    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-    
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
 }
-void render_draw_quad_transform(GLuint texture, float4x4 transform) {
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&transform);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
+void render_draw_quad_transform(GLuint texture, GLKMatrix4 transform) {    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, transform.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
@@ -283,21 +279,19 @@ void render_draw_quad(GLuint texture, float x, float y, float width, float heigh
     render_draw_custom_quad(texture, _meshes[MESH_QUAD], x, y, width, height);
 }
 void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height) {
-    float4x4 mWorld = float4x4translation(x, y, 0.0f);
-    float4x4 mScale = float4x4Scale(width, height, 1.0f);
-    mWorld = float4x4multiply(&mScale, &mWorld);
+    GLKMatrix4 world = GLKMatrix4MakeTranslation(x, y, 0.0f);
+    world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
     
-    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mWorld);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
-    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
     glBindVertexArrayOES(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_resize(float width, float height)
 {
-    _projectionMatrix[kOrthographic] = float4x4OrthographicLH(width, height, 0.0f, 1.0f);
-    _projectionMatrix[kPerspective] = float4x4PerspectiveFovLH(DegToRad(50.0f), width/height, 0.1f, 100.0f);
+    _projectionMatrix[kOrthographic] = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
+    _projectionMatrix[kPerspective] = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(50.0f), width/height, 0.1f, 100.0f);
 }
 void render_set_colorf(float r, float g, float b, float a)
 {
