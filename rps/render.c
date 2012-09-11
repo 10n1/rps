@@ -78,7 +78,6 @@ enum {
 };
 
 static GLuint               _character_meshes[256] = {0};
-//static GLKMatrix4           _projectionMatrix[kNumProjectionTypes];
 static float4x4             _projectionMatrix[kNumProjectionTypes];
 static GLuint               _program = 0;
 static GLuint               _meshes[NUM_MESHES] = {0};
