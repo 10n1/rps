@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "rps_math.h"
 #include "system.h"
 #include "render.h"
 #include "ui.h"
@@ -156,7 +155,7 @@ void game_update(game_t* game) {
     }
 }
 void game_render(game_t* game) {
-    float4x4 transform = float4x4translation(0.0f, -0.2f, -10.0f);
+    GLKMatrix4 transform = GLKMatrix4MakeTranslation(0.0f, -0.2f, -10.0f);
     int ii;
     render_prepare();
 
@@ -173,12 +172,12 @@ void game_render(game_t* game) {
 #else
     render_set_projection_matrix(kPerspective);
     for(ii=kMaxNoteQueue-1;ii>=0;--ii) {
-        transform.r3.z = lerp( -30.0f,
-                               -3.0f,
-                                1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
-        transform.r3.y = lerp(  7.0f,
-                               -0.2f,
-                                1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
+        transform.m32 = lerp(-30.0f,
+                             -3.0f,
+                              1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
+        transform.m31 = lerp( 7.0f,
+                             -0.2f,
+                              1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
         render_set_colorf(1.0f, 1.0f, 1.0f, lerp(1.0f, 0.0f, 1-(game->attacking_weapons[ii].timer/0.25f)) );
         render_draw_quad_transform(_weapon_textures[game->attacking_weapons[ii].weapon], transform);
     }
