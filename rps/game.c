@@ -161,10 +161,17 @@ void game_render(game_t* game) {
     render_prepare();
 
     _print_scores(game);
-    
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
+#if 0
+    render_draw_quad(_weapon_textures[game->current_weapon.weapon],
+                     lerp(-get_device_width()/2-game->weapon_buttons[0]->width/2,
+                           get_device_width()/2+game->weapon_buttons[0]->width/2,
+                           1-(game->current_weapon.timer/kBaseWeaponTimer)),
+                     0.0f,
+                     75.0f*get_device_scale(),
+                     75.0f*get_device_scale());
+#else
     render_set_projection_matrix(kPerspective);
-    
     for(ii=kMaxNoteQueue-1;ii>=0;--ii) {
         transform.r3.z = lerp( -30.0f,
                                -3.0f,
@@ -173,10 +180,10 @@ void game_render(game_t* game) {
                                -0.2f,
                                 1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
         render_set_colorf(1.0f, 1.0f, 1.0f, lerp(1.0f, 0.0f, 1-(game->attacking_weapons[ii].timer/0.25f)) );
-        render_draw_quad_transform(_weapon_textures[game->attacking_weapons[ii].weapon], &transform);
+        render_draw_quad_transform(_weapon_textures[game->attacking_weapons[ii].weapon], transform);
     }
     render_set_projection_matrix(kOrthographic);
-
+#endif
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     ui_render();
     
