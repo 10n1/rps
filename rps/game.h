@@ -14,7 +14,6 @@
 
 typedef struct game_t game_t;
 typedef struct player_t player_t;
-typedef float float2[2];
 
 enum {
     kMaxNoteQueue = 3
