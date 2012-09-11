@@ -11,7 +11,6 @@
 
 #include "system.h"
 #include "render.h"
-//#include "font.h"
 #include "ui.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -23,15 +22,16 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static GLuint _white_texture = 0;
-static GLuint _weapon_textures[kNumWeapons] = {0};
-
-static int _weapon_table[kNumWeapons][kNumWeapons] =
+static const float kBaseWeaponTimer = 2.5f;
+static int kWeaponTable[kNumWeapons][kNumWeapons] =
 {     //   R   P   S  
 /* R */ {  0, -1, +1 },
 /* P */ { +1,  0, -1 },
 /* S */ { -1, +1,  0 },
 };
+
+static GLuint _white_texture = 0;
+static GLuint _weapon_textures[kNumWeapons] = {0};
 
 static void _print_scores(game_t* game) {
     char buffer[256];
@@ -56,7 +56,7 @@ static float lerp(float a, float b, float t) {
     return a + t*(b-a);
 }
 static int _get_winner(weapon_t player_one, weapon_t player_two) {
-    int result = _weapon_table[player_one][player_two];
+    int result = kWeaponTable[player_one][player_two];
     if(player_one == kInvalid)
         return -1;
     return result;
@@ -90,7 +90,7 @@ void game_initialize(game_t* game, float width, float height) {
     
     game->player.selection = kInvalid;
     game->current_weapon.weapon = _get_computer_move();
-    game->current_weapon.timer = 2.0f;
+    game->current_weapon.timer = kBaseWeaponTimer;
     game->state = kPause;
 
     _white_texture = render_create_texture("assets/white.png");
@@ -124,6 +124,8 @@ void game_initialize(game_t* game, float width, float height) {
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
     game->initialized = 1;
+
+    render_set_projection_matrix(kOrthographic);
 }
 void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
@@ -141,7 +143,7 @@ void game_update(game_t* game) {
     if(game->current_weapon.timer <= 0.0f) {
         game->player.score += _get_winner(game->player.selection, game->current_weapon.weapon);
         game->current_weapon.weapon = _get_computer_move();
-        game->current_weapon.timer = 2.0f;
+        game->current_weapon.timer = kBaseWeaponTimer;
     }
 }
 void game_render(game_t* game) {
@@ -150,7 +152,9 @@ void game_render(game_t* game) {
     _print_scores(game);
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     render_draw_quad(_weapon_textures[game->current_weapon.weapon],
-                     lerp(-get_device_width()/2, get_device_width()/2, 1-(game->current_weapon.timer/2.0f)),
+                     lerp(-get_device_width()/2-game->weapon_buttons[0]->width/2,
+                           get_device_width()/2+game->weapon_buttons[0]->width/2,
+                           1-(game->current_weapon.timer/kBaseWeaponTimer)),
                      0.0f,
                      75.0f*get_device_scale(),
                      75.0f*get_device_scale());

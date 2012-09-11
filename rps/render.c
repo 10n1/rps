@@ -77,11 +77,12 @@ enum {
     NUM_MESHES
 };
 
-static GLuint           _character_meshes[256] = {0};
-static GLKMatrix4       _projectionMatrix;
-static GLuint           _program = 0;
-static GLuint           _meshes[NUM_MESHES] = {0};
-static GLint            _uniforms[NUM_UNIFORMS] = {-1};
+static GLuint               _character_meshes[256] = {0};
+static GLKMatrix4           _projectionMatrix[kNumProjectionTypes];
+static GLuint               _program = 0;
+static GLuint               _meshes[NUM_MESHES] = {0};
+static GLint                _uniforms[NUM_UNIFORMS] = {-1};
+static projection_type_t    _current_projection = kOrthographic;
 
 /*----------------------------------------------------------------------------*\
 External
@@ -255,17 +256,20 @@ GLuint render_create_texture(const char* filename)
     
     return texture;
 }
+void render_set_projection_matrix(projection_type_t type) {
+    _current_projection = type;
+}
 void render_draw_fullscreen_quad(void)
 {
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, GLKMatrix4Identity.m);
     glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
 }
 void render_draw_quad_transform(GLuint texture, GLKMatrix4 transform) {    
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, transform.m);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
@@ -279,14 +283,15 @@ void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float
     world = GLKMatrix4Multiply(world, GLKMatrix4MakeScale(width, height, 1.0f)); 
     
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, world.m);
-    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix.m);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, _projectionMatrix[_current_projection].m);
     glBindVertexArrayOES(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_resize(float width, float height)
 {
-    _projectionMatrix = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
+    _projectionMatrix[kOrthographic] = GLKMatrix4MakeOrtho(-width/2, width/2, -height/2, height/2, 0.0f, 1.0f);
+    _projectionMatrix[kPerspective] = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(50.0f), width/height, 0.1f, 100.0f);
 }
 void render_set_colorf(float r, float g, float b, float a)
 {

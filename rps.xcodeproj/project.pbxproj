@@ -43,7 +43,7 @@
 		2772A22115F470650074077F /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		277A362D15AEA244009A067D /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		277A362F15AEA37B009A067D /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
-		27A0C15B15ACDACD000BA591 /* RPS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RPS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27A0C15B15ACDACD000BA591 /* RPSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RPSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A0C15F15ACDACD000BA591 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		27A0C16115ACDACD000BA591 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		27A0C16315ACDACD000BA591 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -99,7 +99,7 @@
 		27A0C15C15ACDACD000BA591 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				27A0C15B15ACDACD000BA591 /* RPS.app */,
+				27A0C15B15ACDACD000BA591 /* RPSX.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,9 +155,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		27A0C15A15ACDACD000BA591 /* RPS */ = {
+		27A0C15A15ACDACD000BA591 /* RPSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPS" */;
+			buildConfigurationList = 27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPSX" */;
 			buildPhases = (
 				27A0C15715ACDACD000BA591 /* Sources */,
 				27A0C15815ACDACD000BA591 /* Frameworks */,
@@ -167,9 +167,9 @@
 			);
 			dependencies = (
 			);
-			name = RPS;
+			name = RPSX;
 			productName = rps;
-			productReference = 27A0C15B15ACDACD000BA591 /* RPS.app */;
+			productReference = 27A0C15B15ACDACD000BA591 /* RPSX.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -192,7 +192,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				27A0C15A15ACDACD000BA591 /* RPS */,
+				27A0C15A15ACDACD000BA591 /* RPSX */,
 			);
 		};
 /* End PBXProject section */
@@ -379,7 +379,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPS" */ = {
+		27A0C18415ACDACD000BA591 /* Build configuration list for PBXNativeTarget "RPSX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27A0C18515ACDACD000BA591 /* Debug */,
