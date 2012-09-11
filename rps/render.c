@@ -295,8 +295,8 @@ void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float
 }
 void render_resize(float width, float height)
 {
-    _projectionMatrix[kOrthographic] = float4x4OrthographicLH(width, height, 0.0f, 1.0f);
-    _projectionMatrix[kPerspective] = float4x4PerspectiveFovLH(DegToRad(50.0f), width/height, 0.1f, 100.0f);
+    _projectionMatrix[kOrthographic] = float4x4OrthographicRH(width, height, 0.0f, 1.0f);
+    _projectionMatrix[kPerspective] = float4x4PerspectiveFovRH(DegToRad(50.0f), width/height, 0.1f, 100.0f);
 }
 void render_set_colorf(float r, float g, float b, float a)
 {
