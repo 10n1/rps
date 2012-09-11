@@ -89,8 +89,10 @@ void game_initialize(game_t* game, float width, float height) {
     render_resize(width, height);
     
     game->player.selection = kInvalid;
-    game->current_weapon.weapon = _get_computer_move();
-    game->current_weapon.timer = kBaseWeaponTimer;
+    for(ii=0;ii<kMaxNoteQueue;++ii) {
+        game->attacking_weapons[ii].weapon = _get_computer_move();
+        game->attacking_weapons[ii].timer = kBaseWeaponTimer*(ii+1);
+    }
     game->state = kPause;
 
     _white_texture = render_create_texture("assets/white.png");
@@ -128,6 +130,7 @@ void game_initialize(game_t* game, float width, float height) {
     render_set_projection_matrix(kOrthographic);
 }
 void game_update(game_t* game) {
+    int ii;
     game->delta_time = (float)timer_delta_time(&game->timer);
     if(game->state == kPause)
         return;
@@ -139,15 +142,21 @@ void game_update(game_t* game) {
     
     game->speed = 1/((get_device_width()/get_device_scale())/320) + (game->player.score/10)*0.2f;
     game->speed = max(game->speed, 0.1f);
-    game->current_weapon.timer -= (game->delta_time*game->speed);
-    if(game->current_weapon.timer <= 0.0f) {
-        game->player.score += _get_winner(game->player.selection, game->current_weapon.weapon);
-        game->current_weapon.weapon = _get_computer_move();
-        game->current_weapon.timer = kBaseWeaponTimer;
+    for(ii=0;ii<kMaxNoteQueue;++ii)
+        game->attacking_weapons[ii].timer -= (game->delta_time*game->speed);
+        
+    if(game->attacking_weapons[0].timer <= 0.0f) {
+        game->player.score += _get_winner(game->player.selection, game->attacking_weapons[0].weapon);
+        for(ii=0;ii<kMaxNoteQueue-1;++ii)
+            game->attacking_weapons[ii] = game->attacking_weapons[ii+1];
+            
+        game->attacking_weapons[kMaxNoteQueue-1].weapon = _get_computer_move();
+        game->attacking_weapons[kMaxNoteQueue-1].timer = kBaseWeaponTimer*kMaxNoteQueue;
     }
 }
 void game_render(game_t* game) {
     GLKMatrix4 transform = GLKMatrix4MakeTranslation(0.0f, -0.2f, -10.0f);
+    int ii;
     render_prepare();
 
     _print_scores(game);
@@ -161,15 +170,17 @@ void game_render(game_t* game) {
                      75.0f*get_device_scale(),
                      75.0f*get_device_scale());
 #else
-    transform.m32 = lerp(-40.0f,
-                         -3.0f,
-                          1-(game->current_weapon.timer/kBaseWeaponTimer));
-    transform.m31 = lerp( 4.0f,
-                         -0.2f,
-                          1-(game->current_weapon.timer/kBaseWeaponTimer));
-    render_set_colorf(1.0f, 1.0f, 1.0f, lerp(1.0f, 0.0f, 1-(game->current_weapon.timer/0.25f)) );
     render_set_projection_matrix(kPerspective);
-    render_draw_quad_transform(_weapon_textures[game->current_weapon.weapon], transform);
+    for(ii=kMaxNoteQueue-1;ii>=0;--ii) {
+        transform.m32 = lerp(-30.0f,
+                             -3.0f,
+                              1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
+        transform.m31 = lerp( 7.0f,
+                             -0.2f,
+                              1-(game->attacking_weapons[ii].timer/kBaseWeaponTimer));
+        render_set_colorf(1.0f, 1.0f, 1.0f, lerp(1.0f, 0.0f, 1-(game->attacking_weapons[ii].timer/0.25f)) );
+        render_draw_quad_transform(_weapon_textures[game->attacking_weapons[ii].weapon], transform);
+    }
     render_set_projection_matrix(kOrthographic);
 #endif
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);

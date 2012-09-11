@@ -16,6 +16,10 @@ typedef struct game_t game_t;
 typedef struct player_t player_t;
 typedef float float2[2];
 
+enum {
+    kMaxNoteQueue = 3
+};
+
 typedef enum {
     kPause,
     kGame,
@@ -45,7 +49,7 @@ struct game_t {
     Timer           timer;
     float           delta_time;
     int             initialized;
-    note_t          current_weapon;
+    note_t          attacking_weapons[kMaxNoteQueue];
     float2          current_position;
     float           speed;
     player_t        player;
