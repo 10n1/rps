@@ -48,7 +48,7 @@ static void _print_scores(game_t* game) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         sprintf(buffer, "%d", game->player.score);
     }
-    ui_draw_text_formatted(buffer, kJustifyCenter, height/2-64*scale, scale);
+    ui_draw_text_formatted(buffer, kJustifyRight, height/2-32*scale, scale);
 }
 static weapon_t _get_computer_move(void) {
     return rand() % 3;
