@@ -102,11 +102,12 @@ void game_initialize(game_t* game, float width, float height) {
     _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
     scale = 40.0f*get_device_scale();
-    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
-                                      -width/2 + scale,
-                                      height/2 - scale,
-                                      scale,
-                                      scale);
+//    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
+//                                      -width/2 + scale,
+//                                      height/2 - scale,
+//                                      scale,
+//                                      scale);
+    game->pause_button = ui_create_button_text("Pause", 0.0f, 0.0f, 1.0f);
     game->pause_button->callback = (ui_callback_t*)game_toggle_pause;
     game->pause_button->params[0].ptr = game;
 

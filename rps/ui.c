@@ -205,6 +205,16 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
     }
     return NULL;
 }
+static float _get_text_width(const char* text) {
+    float width = 0.0f;    
+    while(text && *text) {
+        char c = *text;
+        bmfont_char_t glyph = _font_chars[c];
+        width += glyph.xadvance;
+        ++text;
+    }
+    return width * _scale;
+}
 
 /*
  * External
@@ -221,18 +231,11 @@ void ui_draw_text(const char* text, float x, float y, float size) {
     }
 }
 void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, float size) {
-    const char* orig_text = text;
     float draw_x = 0.0f;
     float draw_y = y;
-    float total_width = 0;
+    float total_width = _get_text_width(text);
     size *= _scale * get_device_scale()/2;
-    while(text && *text) {
-        char c = *text;
-        bmfont_char_t glyph = _font_chars[c];
-        total_width += glyph.xadvance * size;
-        ++text;
-    }
-    text = orig_text;
+    total_width *= size / _scale;
     switch(justify) {
         case kJustifyCenter: {
             draw_x -= total_width/2;
@@ -252,18 +255,20 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
             y -= _font_common.lineHeight*size;
     }
 }
-int ui_text_size(void) {
-    return _font_common.lineHeight * (int)(get_device_scale()/2 * _scale);
+float ui_text_size(void) {
+    return _font_common.lineHeight * (get_device_scale()/2) * _scale;
 }
 button_t* ui_create_button_text(const char* text, float x, float y, float size) {
     button_t* button = &_buttons[_num_buttons++];
     button->text = text;
     button->tex = 0;
+    button->width = _get_text_width(text) * size;
+    button->height = ui_text_size() * size;
     button->x = x;
     button->y = y;
-    button->width = size;
-    button->height = size;
+    button->font_size = size;
     button->active = 1;
+    button->color = kWhite;
     return button;
 }
 button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, float height) {
@@ -275,7 +280,7 @@ button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, fl
     button->width = width;
     button->height = height;
     button->active = 1;
-    button->color.r = button->color.g = button->color.b = button->color.a = 1.0f;
+    button->color = kWhite;
     return button;
 }
 void ui_render(void) {
@@ -287,7 +292,7 @@ void ui_render(void) {
 
         render_set_colorfv((float*)&button->color);
         if(button->text) {
-            ui_draw_text(button->text, button->x, button->y, button->height);
+            ui_draw_text(button->text, button->x-(button->width/2), button->y, button->font_size);
         } else {
             render_draw_quad(button->tex,
                              button->x,

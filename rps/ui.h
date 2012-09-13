@@ -44,6 +44,7 @@ typedef struct {
     float y;
     float width;
     float height;
+    float font_size;
     int active;
     color_t color;
     ui_callback_t*  callback;
@@ -53,7 +54,7 @@ typedef struct {
 void ui_init(void);
 void ui_draw_text(const char* text, float x, float y, float size);
 void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, float size);
-int ui_text_size(void);
+float ui_text_size(void);
 button_t* ui_create_button_text(const char* text, float x, float y, float size);
 button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, float height);
 void ui_render(void);
