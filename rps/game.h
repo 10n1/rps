@@ -53,8 +53,9 @@ struct game_t {
     float           speed;
     player_t        player;
     game_state_t    state;
-    float           pause_timer;
     button_t*       pause_button;
+    button_t*       resume_button;
+    button_t*       pause_background;
     button_t*       weapon_buttons[kNumWeapons];
 };
 
@@ -62,8 +63,8 @@ void game_initialize(game_t* game, float width, float height);
 void game_update(game_t* game);
 void game_render(game_t* game);
 void game_shutdown(game_t* game);
-void game_pause(game_t* game);
-void game_resume(game_t* game);
+void game_pause(ui_param_t* p);
+void game_resume(ui_param_t* p);
 void game_toggle_pause(ui_param_t* params);
 
 void game_handle_tap(game_t* game, float x, float y);

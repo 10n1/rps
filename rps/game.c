@@ -102,15 +102,14 @@ void game_initialize(game_t* game, float width, float height) {
     _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
     scale = 40.0f*get_device_scale();
-//    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
-//                                      -width/2 + scale,
-//                                      height/2 - scale,
-//                                      scale,
-//                                      scale);
-    game->pause_button = ui_create_button_text("Pause", 0.0f, 0.0f, 1.0f);
+    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
+                                      -width/2 + scale,
+                                      height/2 - scale,
+                                      scale,
+                                      scale);
     game->pause_button->callback = (ui_callback_t*)game_toggle_pause;
     game->pause_button->params[0].ptr = game;
-
+    
     for(ii=0;ii<kNumWeapons;++ii) {
         float button_size = width/kNumWeapons;
         button_t* button;
@@ -125,6 +124,20 @@ void game_initialize(game_t* game, float width, float height) {
         game->weapon_buttons[ii] = button;
     }
 
+    game->pause_background = ui_create_button_texture(_white_texture,
+                                                      0,
+                                                      0,
+                                                      width,
+                                                      height);
+    game->pause_background->active = 0;
+    game->pause_background->color = kBlack;
+    game->pause_background->color.a = 0.5f;
+
+    game->resume_button = ui_create_button_text("Resume", 0, 0, 1.0f);
+    game->resume_button->callback = (ui_callback_t*)game_resume;
+    game->resume_button->params[0].ptr = game;
+    game->resume_button->active = 0;
+
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
     game->initialized = 1;
@@ -137,11 +150,6 @@ void game_update(game_t* game) {
     game->delta_time = (float)timer_delta_time(&game->timer);
     if(game->state == kPause)
         return;
-
-    if(game->pause_timer > 0.0f) {
-        game->pause_timer -= game->delta_time;
-        return;
-    }
     
     for(ii=0;ii<kMaxNoteQueue;++ii)
         game->attacking_weapons[ii].timer -= (game->delta_time*game->speed);
@@ -192,20 +200,8 @@ void game_render(game_t* game) {
     ui_render();
     
     if(game->state == kPause) {
-        render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
-        glBindTexture(GL_TEXTURE_2D, _white_texture);
-        render_draw_fullscreen_quad();
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
-    } else if(game->pause_timer > 0.0f) {
-        char buffer[32];
-        sprintf(buffer, "%.1f", game->pause_timer);
-        render_set_colorf(0.0f, 0.0f, 0.0f, 0.5f);
-        glBindTexture(GL_TEXTURE_2D, _white_texture);
-        render_draw_fullscreen_quad();
-        render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
-        ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
-        ui_draw_text_formatted(buffer, kJustifyCenter, 40.0f, 1.0f);
     }
 }
 void game_shutdown(game_t* game) {
@@ -217,19 +213,24 @@ void game_handle_tap(game_t* game, float x, float y) {
 void game_toggle_pause(ui_param_t* p) {
     game_t* game = p[0].ptr;
     if(game->state == kPause)
-        game_resume(game);
+        game_resume(p);
     else
-        game_pause(game);
+        game_pause(p);
 }
-void game_pause(game_t* game) {
+void game_pause(ui_param_t* p) {
+    game_t* game = p[0].ptr;
     if(game->state == kMainMenu)
         return;
     game->state = kPause;
-    game->pause_timer = 3.0f;
+    game->resume_button->active = 1;
+    game->pause_background->active = 1;
 }
-void game_resume(game_t* game) {
+void game_resume(ui_param_t* p) {
+    game_t* game = p[0].ptr;
     if(game->state == kMainMenu)
         return;
     game->state = kGame;
     timer_init(&game->timer);
+    game->pause_background->active = 0;
+    game->resume_button->active = 0;
 }

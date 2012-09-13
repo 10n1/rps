@@ -22,6 +22,7 @@ static const color_t kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
 static const color_t KRed =   {1.0f, 0.0f, 0.0f, 1.0f};
 static const color_t kGreen = {0.0f, 1.0f, 0.0f, 1.0f};
 static const color_t kBlue =  {0.0f, 0.0f, 1.0f, 1.0f};
+static const color_t kBlack = {0.0f, 0.0f, 0.0f, 1.0f};
 
 typedef enum {
     kJustifyLeft,
