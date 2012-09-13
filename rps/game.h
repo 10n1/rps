@@ -56,7 +56,9 @@ struct game_t {
     button_t*       pause_button;
     button_t*       resume_button;
     button_t*       pause_background;
+    button_t*       quit_button;
     button_t*       weapon_buttons[kNumWeapons];
+    button_t*       play_button;
 };
 
 void game_initialize(game_t* game, float width, float height);
