@@ -23,7 +23,7 @@ extern void CNSLog(const char* format,...);
 /*----------------------------------------------------------------------------*\
 Internal
 \*----------------------------------------------------------------------------*/
-static const float kBaseWeaponTimer = 2.5f;
+static const float kBaseWeaponTimer = 2.0f;
 static int kWeaponTable[kNumWeapons][kNumWeapons] =
 {     //   R   P   S  
 /* R */ {  0, -1, +1 },
@@ -127,6 +127,7 @@ void game_initialize(game_t* game, float width, float height) {
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
     game->initialized = 1;
+    game->speed = 1.0f;
 
     render_set_projection_matrix(kOrthographic);
 }
@@ -141,18 +142,27 @@ void game_update(game_t* game) {
         return;
     }
     
-    game->speed = 1/((get_device_width()/get_device_scale())/320) + (game->player.score/10)*0.2f;
-    game->speed = max(game->speed, 0.1f);
     for(ii=0;ii<kMaxNoteQueue;++ii)
         game->attacking_weapons[ii].timer -= (game->delta_time*game->speed);
         
     if(game->attacking_weapons[0].timer <= 0.0f) {
-        game->player.score += _get_winner(game->player.selection, game->attacking_weapons[0].weapon);
+        int result = _get_winner(game->player.selection, game->attacking_weapons[0].weapon);
+        game->player.score += result;
+        if(result > 0)
+            game->speed *= 1.01f;
+        else if(result < 0)
+            game->speed *= 0.99f;
+        game->speed = max(game->speed, 0.1f);
+
         for(ii=0;ii<kMaxNoteQueue-1;++ii)
             game->attacking_weapons[ii] = game->attacking_weapons[ii+1];
             
         game->attacking_weapons[kMaxNoteQueue-1].weapon = _get_computer_move();
         game->attacking_weapons[kMaxNoteQueue-1].timer = kBaseWeaponTimer*kMaxNoteQueue;
+
+        game->player.selection = kInvalid;
+        for(ii=0;ii<kNumWeapons;++ii)
+            game->weapon_buttons[ii]->color = kWhite;
     }
 }
 void game_render(game_t* game) {

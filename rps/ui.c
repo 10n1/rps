@@ -255,19 +255,21 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
 int ui_text_size(void) {
     return _font_common.lineHeight * (int)(get_device_scale()/2 * _scale);
 }
-//button_t* ui_create_button_text(const char* text, float width, float height, float x, float y) {
-//    button_t* button = &_buttons[_num_buttons++];
-//    button->text = text;
-//    button->x = x;
-//    button->y = y;
-//    button->width = width;
-//    button->height = height;
-//    button->active = 1;
-//    return button;
-//}
+button_t* ui_create_button_text(const char* text, float x, float y, float size) {
+    button_t* button = &_buttons[_num_buttons++];
+    button->text = text;
+    button->tex = 0;
+    button->x = x;
+    button->y = y;
+    button->width = size;
+    button->height = size;
+    button->active = 1;
+    return button;
+}
 button_t* ui_create_button_texture(GLuint tex, float x, float y, float width, float height) {
     button_t* button = &_buttons[_num_buttons++];
     button->tex = tex;
+    button->text = NULL;
     button->x = x;
     button->y = y;
     button->width = width;
@@ -285,6 +287,7 @@ void ui_render(void) {
 
         render_set_colorfv((float*)&button->color);
         if(button->text) {
+            ui_draw_text(button->text, button->x, button->y, button->height);
         } else {
             render_draw_quad(button->tex,
                              button->x,

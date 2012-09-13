@@ -19,6 +19,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    float height = [[UIScreen mainScreen] bounds].size.height;
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -32,6 +33,7 @@
 
     game_initialize(&_game, get_device_width(), get_device_height());
     [self.viewController setGame:&_game];
+    height = 0.0f;
     return YES;
 }
 
