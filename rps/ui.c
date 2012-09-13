@@ -90,6 +90,8 @@ static int              _char_textures[256] = {0};
 static button_t         _buttons[256] = {0};
 static int              _num_buttons = 0;
 static float            _scale = 0.0f;
+static GLuint           _button_end = 0;
+static GLuint           _button_mid = 0;
 
 static void _load_font(const char* filename) {
     int ii, jj;
@@ -221,6 +223,8 @@ static float _get_text_width(const char* text) {
  */
 void ui_init(void) {
     _load_font("assets/andika.fnt");
+    _button_end = render_create_texture("assets/button_end.png");
+    _button_mid = render_create_texture("assets/white.png");
 }
 void ui_draw_text(const char* text, float x, float y, float size) {
     size *= _scale * get_device_scale()/2;
@@ -292,6 +296,16 @@ void ui_render(void) {
 
         render_set_colorfv((float*)&button->color);
         if(button->text) {
+            float height = ui_text_size()*button->font_size;
+            float4x4 mirror = float4x4Scale(-height/2, height, 1.0f);
+            mirror.r3.x = button->x+(button->width/2) + height/4;
+            mirror.r3.y = button->y+height/2;
+            render_set_colorfv((float*)&kWhite);
+            render_draw_quad(_button_end, button->x - (button->width/2) - height/4, button->y+height/2, height/2, height);
+            render_draw_quad_transform(_button_end, &mirror);
+            
+            render_draw_quad(_button_mid, button->x, button->y+height/2, button->width, height);
+            render_set_colorfv((float*)&kBlack);
             ui_draw_text(button->text, button->x-(button->width/2), button->y, button->font_size);
         } else {
             render_draw_quad(button->tex,
