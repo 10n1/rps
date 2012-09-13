@@ -262,6 +262,9 @@ void ui_draw_text_formatted(const char* text, ui_justify_t justify, float y, flo
 float ui_text_size(void) {
     return _font_common.lineHeight * (get_device_scale()/2) * _scale;
 }
+float ui_text_width(const char* text) {
+    return _get_text_width(text);
+}
 button_t* ui_create_button_text(const char* text, float x, float y, float size) {
     button_t* button = &_buttons[_num_buttons++];
     button->text = text;

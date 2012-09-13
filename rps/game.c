@@ -133,7 +133,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->pause_background->color = kBlack;
     game->pause_background->color.a = 0.5f;
 
-    game->resume_button = ui_create_button_text("Resume", 0, 0, 1.0f);
+    game->resume_button = ui_create_button_texture(render_create_texture("assets/button.png"), 0, 0, ui_text_width("Resume")*1.2f, ui_text_size()-8*get_device_scale());
     game->resume_button->callback = (ui_callback_t*)game_resume;
     game->resume_button->params[0].ptr = game;
     game->resume_button->active = 0;
@@ -202,6 +202,8 @@ void game_render(game_t* game) {
     if(game->state == kPause) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
+        render_set_colorf(0.0f, 0.0f, 0.0f, 1.0f);
+        ui_draw_text_formatted("Resume", kJustifyCenter, -ui_text_size()/2+2*get_device_scale(), 1.0f);
     }
 }
 void game_shutdown(game_t* game) {
