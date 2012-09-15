@@ -69,6 +69,8 @@ void game_pause(ui_param_t* p);
 void game_resume(ui_param_t* p);
 void game_toggle_pause(ui_param_t* params);
 
+void game_clear_touch(game_t* game);
+void game_handle_touch(game_t* game, float x, float y);
 void game_handle_tap(game_t* game, float x, float y);
 
 #endif /* include guard */

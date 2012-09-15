@@ -55,6 +55,8 @@
     tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tap.numberOfTapsRequired = 1;
     [[self view] addGestureRecognizer:tap];
+
+    [[self view] setMultipleTouchEnabled:TRUE];
 }
 - (void)handleTap:(UIGestureRecognizer *)sender
 {
@@ -119,6 +121,42 @@
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     game_render(_game);
+}
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    for(UITouch *touch in touches) {
+        CGPoint tapPoint = [touch locationInView:nil];
+        tapPoint.x *= get_device_scale();
+        tapPoint.y *= get_device_scale();
+        if([[UIDevice currentDevice] orientation] == UIInterfaceOrientationPortraitUpsideDown) {
+            // The OS should really rotate the taps for us :-(
+            tapPoint.y = get_device_height() - tapPoint.y;
+            tapPoint.x = get_device_width() - tapPoint.x;
+        }
+        game_handle_touch(_game, tapPoint.x, tapPoint.y);
+        break;
+    }
+}
+ 
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    for(UITouch *touch in touches) {
+        CGPoint tapPoint = [touch locationInView:nil];
+        tapPoint.x *= get_device_scale();
+        tapPoint.y *= get_device_scale();
+        if([[UIDevice currentDevice] orientation] == UIInterfaceOrientationPortraitUpsideDown) {
+            // The OS should really rotate the taps for us :-(
+            tapPoint.y = get_device_height() - tapPoint.y;
+            tapPoint.x = get_device_width() - tapPoint.x;
+        }
+        game_handle_touch(_game, tapPoint.x, tapPoint.y);
+        break;
+    }
+}
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    game_clear_touch(_game);
+}
+ 
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    game_clear_touch(_game);
 }
 
 @end

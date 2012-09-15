@@ -25,7 +25,7 @@ Internal
 \*----------------------------------------------------------------------------*/
 static const float kBaseWeaponTimer = 1.5f;
 static const int kWeaponTable[kNumWeapons][kNumWeapons] =
-{     //   R   P   S  
+{     //   R   P   S
 /* R */ {  0, -1, +1 },
 /* P */ { +1,  0, -1 },
 /* S */ { -1, +1,  0 },
@@ -80,13 +80,13 @@ static void _game_start(ui_param_t* p) {
     game_t* game = p[0].ptr;
     int ii;
     game->state = kGame;
-    
+
     for(ii=0;ii<kNumWeapons;++ii) {
         game->weapon_buttons[ii]->active = 1;
     }
     game->pause_button->active = 1;
     game->play_button->active = 0;
-    
+
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
     game->initialized = 1;
@@ -94,7 +94,7 @@ static void _game_start(ui_param_t* p) {
     game->player.score = 0;
     game->player.selection = kInvalid;
 
-    
+
     for(ii=0;ii<kMaxNoteQueue;++ii) {
         game->attacking_weapons[ii].weapon = _get_computer_move();
         game->attacking_weapons[ii].timer = kBaseWeaponTimer*(ii+1);
@@ -110,7 +110,7 @@ static void _game_quit(ui_param_t* p) {
     game->quit_button->active = 0;
     game->resume_button->active = 0;
     game->pause_background->active = 0;
-    
+
     game->play_button->active = 1;
 
     game->state = kMainMenu;
@@ -129,7 +129,7 @@ void game_initialize(game_t* game, float width, float height) {
     render_init();
     ui_init();
     render_resize(width, height);
-    
+
     game->player.selection = kInvalid;
     for(ii=0;ii<kMaxNoteQueue;++ii) {
         game->attacking_weapons[ii].weapon = _get_computer_move();
@@ -152,7 +152,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->pause_button->callback = (ui_callback_t*)game_toggle_pause;
     game->pause_button->params[0].ptr = game;
     game->pause_button->active = 0;
-    
+
     for(ii=0;ii<kNumWeapons;++ii) {
         float button_size = width/kNumWeapons;
         button_t* button;
@@ -161,9 +161,9 @@ void game_initialize(game_t* game, float width, float height) {
                                           -height/2 + button_size/2,
                                           button_size,
                                           button_size);
-        button->callback = _player_selection;
-        button->params[0].ptr = game;
-        button->params[1].i = (weapon_t)ii;
+        //button->callback = _player_selection;
+        //button->params[0].ptr = game;
+        //button->params[1].i = (weapon_t)ii;
         button->active = 0;
         game->weapon_buttons[ii] = button;
     }
@@ -181,12 +181,12 @@ void game_initialize(game_t* game, float width, float height) {
     game->resume_button->callback = (ui_callback_t*)game_resume;
     game->resume_button->params[0].ptr = game;
     game->resume_button->active = 0;
-    
+
     game->quit_button = ui_create_button_texture(_button_texture, 0, -50*get_device_scale(), ui_text_width("Quit")*1.2f, ui_text_size()-8*get_device_scale());
     game->quit_button->callback = (ui_callback_t*)_game_quit;
     game->quit_button->params[0].ptr = game;
     game->quit_button->active = 0;
-    
+
     game->play_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Play")*1.2f*1.5f, 1.5f*ui_text_size()-8*get_device_scale());
     game->play_button->callback = _game_start;
     game->play_button->params[0].ptr = game;
@@ -208,10 +208,10 @@ void game_update(game_t* game) {
     {
         return;
     }
-    
+
     for(ii=0;ii<kMaxNoteQueue;++ii)
         game->attacking_weapons[ii].timer -= (game->delta_time*game->speed);
-        
+
     if(game->attacking_weapons[0].timer <= 0.0f) {
         int result = _get_winner(game->player.selection, game->attacking_weapons[0].weapon);
         game->player.score += result;
@@ -223,13 +223,13 @@ void game_update(game_t* game) {
 
         for(ii=0;ii<kMaxNoteQueue-1;++ii)
             game->attacking_weapons[ii] = game->attacking_weapons[ii+1];
-            
+
         game->attacking_weapons[kMaxNoteQueue-1].weapon = _get_computer_move();
         game->attacking_weapons[kMaxNoteQueue-1].timer = kBaseWeaponTimer*kMaxNoteQueue;
 
-        game->player.selection = kInvalid;
-        for(ii=0;ii<kNumWeapons;++ii)
-            game->weapon_buttons[ii]->color = kWhite;
+        //game->player.selection = kInvalid;
+        //for(ii=0;ii<kNumWeapons;++ii)
+            //game->weapon_buttons[ii]->color = kWhite;
     }
 }
 void game_render(game_t* game) {
@@ -248,10 +248,10 @@ void game_render(game_t* game) {
     }
 
     _print_scores(game);
-    
+
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     render_set_projection_matrix(kPerspective);
-    
+
     for(ii=kMaxNoteQueue-1;ii>=0;--ii) {
         transform.r3.z = lerp( -30.0f,
                                -3.0f,
@@ -266,7 +266,7 @@ void game_render(game_t* game) {
 
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
     ui_render();
-    
+
     if(game->state == kPause) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
         ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
@@ -281,12 +281,41 @@ void game_shutdown(game_t* game) {
 void game_handle_tap(game_t* game, float x, float y) {
     ui_tap(x, y);
 }
+
+void game_handle_touch(game_t* game, float x, float y) {
+    int ii;
+    x -= get_device_width()/2;
+    y = -y + get_device_height()/2;
+    for(ii=0;ii<kNumWeapons;++ii) {
+        float l, r, b, t;
+        button_t* button = game->weapon_buttons[ii];
+        if(!button->active)
+            continue;
+        l = button->x - button->width/2;
+        r = button->x + button->width/2;
+        b = button->y - button->height/2;
+        t = button->y + button->height/2;
+        if(x > l && x <= r && y > b && y <= t) {
+            ui_param_t p[2];
+            p[0].ptr = game;
+            p[1].i = ii;
+            _player_selection(p);
+        }
+    }
+}
 void game_toggle_pause(ui_param_t* p) {
     game_t* game = p[0].ptr;
     if(game->state == kPause)
         game_resume(p);
     else
         game_pause(p);
+}
+void game_clear_touch(game_t* game) {    
+    int ii;
+    for(ii=0;ii<kNumWeapons;++ii) {
+        game->weapon_buttons[ii]->color = kWhite;
+    }
+    game->player.selection = kInvalid;
 }
 void game_pause(ui_param_t* p) {
     game_t* game = p[0].ptr;
