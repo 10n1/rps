@@ -77,12 +77,24 @@ enum {
     NUM_MESHES
 };
 
+enum {
+    VERTEX_BUFFER,
+    INDEX_BUFFER,
+    
+    NUM_BUFFERS
+};
+
 static GLuint               _character_meshes[256] = {0};
 static float4x4             _projectionMatrix[kNumProjectionTypes];
 static GLuint               _program = 0;
-static GLuint               _meshes[NUM_MESHES] = {0};
 static GLint                _uniforms[NUM_UNIFORMS] = {-1};
 static projection_type_t    _current_projection = kOrthographic;
+
+#ifdef ANDROID
+static GLuint               _meshes[NUM_MESHES * NUM_BUFFERS] = {0};
+#else
+static GLuint               _meshes[NUM_MESHES] = {0};
+#endif
 
 /*----------------------------------------------------------------------------*\
 External
@@ -117,6 +129,19 @@ void render_init(void)
     GLuint vertex_shader;
     GLuint fragment_shader;
     GLuint buffers[2] = {0};
+#ifdef ANDROID
+    glGenBuffers( 2, &_meshes[MESH_FULLSCREEN] );
+    glBindBuffer( GL_ARRAY_BUFFER, _meshes[MESH_FULLSCREEN + VERTEX_BUFFER] );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(fullscreen_quad_vertices), fullscreen_quad_vertices, GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _meshes[MESH_FULLSCREEN + INDEX_BUFFER] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW );
+    
+    glGenBuffers( 2, &_meshes[MESH_QUAD] );
+    glBindBuffer( GL_ARRAY_BUFFER, _meshes[MESH_QUAD + VERTEX_BUFFER] );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW );
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _meshes[MESH_QUAD + INDEX_BUFFER] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW );
+#else
     glGenVertexArraysOES(NUM_MESHES, _meshes);
     glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
     
@@ -145,6 +170,7 @@ void render_init(void)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
     
     glBindVertexArrayOES(0);
+#endif
     
     /* Create program */
     if(system_load_file("assets/Shaders/Shader.vsh", buffer, sizeof(buffer))) {
@@ -244,7 +270,15 @@ GLuint render_create_texture(const char* filename)
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    
+#ifdef ANDROID
+    char* file_data = NULL;
+    int file_size = 0;
+    system_load_file_to_memory( filename, &file_data, &file_size );
+    data = stbi_load_from_memory( (unsigned char*)file_data, file_size, &width, &height, &comp, 4 );
+#else
     data = stbi_load(system_get_path(filename), &width, &height, &comp, 4);
+#endif
     if(data == NULL) {
         CNSLog("Texture %s load failed", filename);
         return 0;
@@ -266,8 +300,19 @@ void render_draw_fullscreen_quad(void)
     float4x4 mIdentity = float4x4identity();
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mIdentity);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&mIdentity);
+
+#ifdef ANDROID
+    glBindBuffer( GL_ARRAY_BUFFER, _meshes[MESH_FULLSCREEN + VERTEX_BUFFER] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _meshes[MESH_FULLSCREEN + INDEX_BUFFER] );
     
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+#else
     glBindVertexArrayOES(_meshes[MESH_FULLSCREEN]);
+#endif
+    
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
     
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
@@ -275,15 +320,27 @@ void render_draw_fullscreen_quad(void)
 void render_draw_quad_transform(GLuint texture, const float4x4* transform) {
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)transform);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
+    
+#ifdef ANDROID
+    glBindBuffer( GL_ARRAY_BUFFER, _meshes[MESH_QUAD + VERTEX_BUFFER] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _meshes[MESH_QUAD + INDEX_BUFFER] );
+    
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+#else
     glBindVertexArrayOES(_meshes[MESH_QUAD]);
+#endif
+    
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
 void render_draw_quad(GLuint texture, float x, float y, float width, float height)
 {
-    render_draw_custom_quad(texture, _meshes[MESH_QUAD], x, y, width, height);
+    render_draw_custom_quad( texture, MESH_QUAD, x, y, width, height );
 }
-void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height) {
+void render_draw_custom_quad(GLuint texture, unsigned int mesh_type, float x, float y, float width, float height) {
     float4x4 mWorld = float4x4translation(x, y, 0.0f);
     float4x4 mScale = float4x4Scale(width, height, 1.0f);
     mWorld = float4x4multiply(&mScale, &mWorld);
@@ -291,7 +348,17 @@ void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mWorld);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
     
-    glBindVertexArrayOES(vao);
+#ifdef ANDROID
+    glBindBuffer( GL_ARRAY_BUFFER, _meshes[mesh_type + VERTEX_BUFFER] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _meshes[mesh_type + INDEX_BUFFER] );
+    
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
+#else
+    glBindVertexArrayOES(_meshes[mesh_type]);
+#endif
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
