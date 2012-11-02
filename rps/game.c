@@ -77,44 +77,7 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
 //     game->player.selection = weapon;
 // }
 
-<<<<<<< HEAD
-static void _game_start(ui_param_t* p) {
-    game_t* game = p[0].ptr;
-    int ii;
-    game->state = kGame;
 
-    for(ii=0;ii<kNumWeapons;++ii) {
-        game->weapon_buttons[ii]->active = 1;
-    }
-    game->pause_button->active = 1;
-    game->play_button->active = 0;
-
-    timer_init(&game->timer);
-    srand((int32_t)game->timer.start_time);
-    game->initialized = 1;
-    game->speed = 1.0f;
-    game->player.score = 0;
-    game->player.selection = kInvalid;
-
-
-    for(ii=0;ii<kMaxNoteQueue;++ii) {
-        game->attacking_weapons[ii].weapon = _get_computer_move();
-        game->attacking_weapons[ii].timer = kBaseWeaponTimer*(ii+1);
-    }
-}
-static void _game_quit(ui_param_t* p) {
-    game_t* game = p[0].ptr;
-    int ii;
-    for(ii=0;ii<kNumWeapons;++ii) {
-        game->weapon_buttons[ii]->active = 0;
-    }
-    game->pause_button->active = 0;
-    game->quit_button->active = 0;
-    game->resume_button->active = 0;
-    game->pause_background->active = 0;
-
-    game->play_button->active = 1;
-=======
 // static void _game_start(ui_param_t* p) {
 //     game_t* game = p[0].ptr;
 //     int ii;
@@ -151,7 +114,6 @@ static void _game_quit(ui_param_t* p) {
 //     game->pause_background->active = 0;
     
 //     game->play_button->active = 1;
->>>>>>> temporary commenting out some UI code until I make it work on Android
 
 //     game->state = kMainMenu;
 // }
@@ -184,31 +146,7 @@ void game_initialize(game_t* game, float width, float height) {
     _weapon_textures[kScissors] = render_create_texture("assets/scissors.png");
 
     scale = 40.0f*get_device_scale();
-<<<<<<< HEAD
-    game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
-                                      -width/2 + scale,
-                                      height/2 - scale,
-                                      scale,
-                                      scale);
-    game->pause_button->callback = (ui_callback_t*)game_toggle_pause;
-    game->pause_button->params[0].ptr = game;
-    game->pause_button->active = 0;
 
-    for(ii=0;ii<kNumWeapons;++ii) {
-        float button_size = width/kNumWeapons;
-        button_t* button;
-        button = ui_create_button_texture(_weapon_textures[ii],
-                                          (ii*button_size)-width/2 + button_size/2,
-                                          -height/2 + button_size/2,
-                                          button_size,
-                                          button_size);
-        //button->callback = _player_selection;
-        //button->params[0].ptr = game;
-        //button->params[1].i = (weapon_t)ii;
-        button->active = 0;
-        game->weapon_buttons[ii] = button;
-    }
-=======
     // game->pause_button = ui_create_button_texture(render_create_texture("assets/pause.png"),
     //                                   -width/2 + scale,
     //                                   height/2 - scale,
@@ -232,7 +170,6 @@ void game_initialize(game_t* game, float width, float height) {
     //     button->active = 0;
     //     game->weapon_buttons[ii] = button;
     // }
->>>>>>> temporary commenting out some UI code until I make it work on Android
 
     // game->pause_background = ui_create_button_texture(render_create_texture("assets/white.png"),
     //                                                   0,
@@ -243,22 +180,6 @@ void game_initialize(game_t* game, float width, float height) {
     // game->pause_background->color = kBlack;
     // game->pause_background->color.a = 0.5f;
 
-<<<<<<< HEAD
-    game->resume_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Resume")*1.2f, ui_text_size()-8*get_device_scale());
-    game->resume_button->callback = (ui_callback_t*)game_resume;
-    game->resume_button->params[0].ptr = game;
-    game->resume_button->active = 0;
-
-    game->quit_button = ui_create_button_texture(_button_texture, 0, -50*get_device_scale(), ui_text_width("Quit")*1.2f, ui_text_size()-8*get_device_scale());
-    game->quit_button->callback = (ui_callback_t*)_game_quit;
-    game->quit_button->params[0].ptr = game;
-    game->quit_button->active = 0;
-
-    game->play_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Play")*1.2f*1.5f, 1.5f*ui_text_size()-8*get_device_scale());
-    game->play_button->callback = _game_start;
-    game->play_button->params[0].ptr = game;
-    game->play_button->active = 1;
-=======
     // game->resume_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Resume")*1.2f, ui_text_size()-8*get_device_scale());
     // game->resume_button->callback = (ui_callback_t*)game_resume;
     // game->resume_button->params[0].ptr = game;
@@ -273,7 +194,6 @@ void game_initialize(game_t* game, float width, float height) {
     // game->play_button->callback = _game_start;
     // game->play_button->params[0].ptr = game;
     // game->play_button->active = 1;
->>>>>>> temporary commenting out some UI code until I make it work on Android
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -310,15 +230,9 @@ void game_update(game_t* game) {
         game->attacking_weapons[kMaxNoteQueue-1].weapon = _get_computer_move();
         game->attacking_weapons[kMaxNoteQueue-1].timer = kBaseWeaponTimer*kMaxNoteQueue;
 
-<<<<<<< HEAD
-        //game->player.selection = kInvalid;
-        //for(ii=0;ii<kNumWeapons;++ii)
-            //game->weapon_buttons[ii]->color = kWhite;
-=======
         game->player.selection = kInvalid;
 //        for(ii=0;ii<kNumWeapons;++ii)
 //            game->weapon_buttons[ii]->color = kWhite;
->>>>>>> temporary commenting out some UI code until I make it work on Android
     }
 }
 void game_render(game_t* game) {
@@ -354,13 +268,8 @@ void game_render(game_t* game) {
     render_set_projection_matrix(kOrthographic);
 
     render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
-<<<<<<< HEAD
-    ui_render();
-
-=======
     // ui_render();
     
->>>>>>> temporary commenting out some UI code until I make it work on Android
     if(game->state == kPause) {
         render_set_colorf(1.0f, 1.0f, 1.0f, 1.0f);
 //        ui_draw_text_formatted("Paused", kJustifyCenter, 100.0f, 1.5f);
@@ -373,66 +282,29 @@ void game_shutdown(game_t* game) {
     game->initialized = 0;
 }
 void game_handle_tap(game_t* game, float x, float y) {
-<<<<<<< HEAD
     ui_tap(x, y);
 }
 
 void game_handle_touch(game_t* game, float x, float y) {
-    int ii;
-    x -= get_device_width()/2;
-    y = -y + get_device_height()/2;
-    for(ii=0;ii<kNumWeapons;++ii) {
-        float l, r, b, t;
-        button_t* button = game->weapon_buttons[ii];
-        if(!button->active)
-            continue;
-        l = button->x - button->width/2;
-        r = button->x + button->width/2;
-        b = button->y - button->height/2;
-        t = button->y + button->height/2;
-        if(x > l && x <= r && y > b && y <= t) {
-            ui_param_t p[2];
-            p[0].ptr = game;
-            p[1].i = ii;
-            _player_selection(p);
-        }
-    }
-}
-void game_toggle_pause(ui_param_t* p) {
-    game_t* game = p[0].ptr;
-    if(game->state == kPause)
-        game_resume(p);
-    else
-        game_pause(p);
-}
-void game_clear_touch(game_t* game) {    
-    int ii;
-    for(ii=0;ii<kNumWeapons;++ii) {
-        game->weapon_buttons[ii]->color = kWhite;
-    }
-    game->player.selection = kInvalid;
-}
-void game_pause(ui_param_t* p) {
-    game_t* game = p[0].ptr;
-    if(game->state == kMainMenu)
-        return;
-    game->state = kPause;
-    game->resume_button->active = 1;
-    game->quit_button->active = 1;
-    game->pause_background->active = 1;
-}
-void game_resume(ui_param_t* p) {
-    game_t* game = p[0].ptr;
-    if(game->state == kMainMenu)
-        return;
-    game->state = kGame;
-    timer_init(&game->timer);
-    game->pause_background->active = 0;
-    game->resume_button->active = 0;
-    game->quit_button->active = 0;
-=======
-    // ui_tap(x, y);
->>>>>>> temporary commenting out some UI code until I make it work on Android
+//    int ii;
+//    x -= get_device_width()/2;
+//    y = -y + get_device_height()/2;
+//    for(ii=0;ii<kNumWeapons;++ii) {
+//        float l, r, b, t;
+//        button_t* button = game->weapon_buttons[ii];
+//        if(!button->active)
+//            continue;
+//        l = button->x - button->width/2;
+//        r = button->x + button->width/2;
+//        b = button->y - button->height/2;
+//        t = button->y + button->height/2;
+//        if(x > l && x <= r && y > b && y <= t) {
+//            ui_param_t p[2];
+//            p[0].ptr = game;
+//            p[1].i = ii;
+//            _player_selection(p);
+//        }
+//    }
 }
 //void game_toggle_pause(ui_param_t* p) {
 //    game_t* game = p[0].ptr;
@@ -441,6 +313,13 @@ void game_resume(ui_param_t* p) {
 //    else
 //        game_pause(p);
 //}
+void game_clear_touch(game_t* game) {
+//    int ii;
+//    for(ii=0;ii<kNumWeapons;++ii) {
+//        game->weapon_buttons[ii]->color = kWhite;
+//    }
+    game->player.selection = kInvalid;
+}
 //void game_pause(ui_param_t* p) {
 //    game_t* game = p[0].ptr;
 //    if(game->state == kMainMenu)
@@ -459,4 +338,3 @@ void game_resume(ui_param_t* p) {
 //    game->pause_background->active = 0;
 //    game->resume_button->active = 0;
 //    game->quit_button->active = 0;
-//}
