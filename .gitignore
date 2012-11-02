@@ -172,7 +172,3 @@ xcuserdata/
 ###########################
 projects/android/gen/*
 projects/android/libs/*
-
-*.properties
-
-projects/android/proguard-project.txt
