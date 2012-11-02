@@ -57,6 +57,34 @@ double timer_running_time(Timer* timer) {
     running_time = (current_time - timer->start_time) * timer->frequency;
     return running_time;
 }
+#elif defined(ANDROID)
+#include <time.h>
+
+uint64_t rps_get_time( void ) {
+    struct timespec now;
+    clock_gettime( CLOCK_MONOTONIC, &now );
+    return ( 1000 * now.tv_sec + now.tv_nsec / 1e6 );
+}
+
+void timer_init(Timer* timer) {
+    timer_reset(timer);
+}
+void timer_reset(Timer* timer) {
+    timer->start_time = timer->prev_time = rps_get_time();
+}
+double timer_delta_time(Timer* timer) {
+    uint64_t current_time = rps_get_time();
+    double delta_time = ( double )( current_time - timer->prev_time );
+    timer->prev_time = current_time;
+    
+    return delta_time;
+}
+double timer_running_time(Timer* timer) {
+    uint64_t current_time = rps_get_time();
+    double running_time = ( double )( current_time - timer->start_time );
+    
+    return running_time;
+}
 #else
     #error Need a timer
 #endif
