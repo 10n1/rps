@@ -166,3 +166,13 @@ pip-log.txt
 # Xcode
 ###########################
 xcuserdata/
+
+###########################
+# Android
+###########################
+projects/android/gen/*
+projects/android/libs/*
+
+*.properties
+
+projects/android/proguard-project.txt
