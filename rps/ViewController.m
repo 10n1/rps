@@ -6,11 +6,13 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "ViewController.h"
 
+#include "rps_math.h"
 #include "render.h"
 #include "game.h"
 #include "system.h"
+
+#import "ViewController.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 

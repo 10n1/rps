@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#include "rps_math.h"
 #include "game.h"
 
 @class ViewController;
