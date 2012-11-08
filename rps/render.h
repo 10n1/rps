@@ -26,6 +26,28 @@ enum {
     NUM_ATTRIBUTES
 };
 
+enum {
+    UNIFORM_WORLD_MATRIX,
+    UNIFORM_VIEWPROJECTION_MATRIX,
+    UNIFORM_TEXTURE,
+    UNIFORM_COLOR,
+    NUM_UNIFORMS
+};
+
+enum {
+    MESH_FULLSCREEN,
+    MESH_QUAD,
+    
+    NUM_MESHES
+};
+
+enum {
+    VERTEX_BUFFER,
+    INDEX_BUFFER,
+    
+    NUM_BUFFERS
+};
+
 typedef enum {
     kPerspective,
     kOrthographic,
@@ -53,7 +75,8 @@ void render_set_colorfv(float* c);
 void render_set_projection_matrix(projection_type_t type);
 void render_draw_quad(GLuint texture, float x, float y, float width, float height);
 void render_draw_quad_transform(GLuint texture, const float4x4* transform);
-void render_draw_custom_quad(GLuint texture, unsigned int mesh_type, float x, float y, float width, float height);
+void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height);
+void render_draw_custom_quad_vbo(GLuint texture, GLuint vertex_buffer, GLuint index_buffer, float x, float y, float width, float height);
 void render_draw_fullscreen_quad(void);
 void render_resize(float width, float height);
 

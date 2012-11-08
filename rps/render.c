@@ -62,27 +62,6 @@ static int _validate_program(GLuint program)
     return 0;
 }
 
-enum {
-    UNIFORM_WORLD_MATRIX,
-    UNIFORM_VIEWPROJECTION_MATRIX,
-    UNIFORM_TEXTURE,
-    UNIFORM_COLOR,
-    NUM_UNIFORMS
-};
-
-enum {
-    MESH_FULLSCREEN,
-    MESH_QUAD,
-
-    NUM_MESHES
-};
-
-enum {
-    VERTEX_BUFFER,
-    INDEX_BUFFER,
-    
-    NUM_BUFFERS
-};
 
 static GLuint               _character_meshes[256] = {0};
 static float4x4             _projectionMatrix[kNumProjectionTypes];
@@ -171,6 +150,8 @@ void render_init(void)
     
     glBindVertexArrayOES(0);
 #endif
+    
+    CNSLog("Loading shaders\n");
     
     /* Create program */
     if(system_load_file("assets/Shaders/Shader.vsh", buffer, sizeof(buffer))) {
@@ -338,9 +319,13 @@ void render_draw_quad_transform(GLuint texture, const float4x4* transform) {
 }
 void render_draw_quad(GLuint texture, float x, float y, float width, float height)
 {
-    render_draw_custom_quad( texture, MESH_QUAD, x, y, width, height );
+#ifdef ANDROID
+    render_draw_custom_quad_vbo(texture, _meshes[MESH_QUAD + VERTEX_BUFFER], _meshes[MESH_QUAD + INDEX_BUFFER], x, y, width, height);
+#else
+    render_draw_custom_quad( texture, _meshes[MESH_QUAD], x, y, width, height );
+#endif
 }
-void render_draw_custom_quad(GLuint texture, unsigned int mesh_type, float x, float y, float width, float height) {
+void render_draw_custom_quad(GLuint texture, GLuint vao, float x, float y, float width, float height) {
     float4x4 mWorld = float4x4translation(x, y, 0.0f);
     float4x4 mScale = float4x4Scale(width, height, 1.0f);
     mWorld = float4x4multiply(&mScale, &mWorld);
@@ -348,20 +333,35 @@ void render_draw_custom_quad(GLuint texture, unsigned int mesh_type, float x, fl
     glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mWorld);
     glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
     
-#ifdef ANDROID
-    glBindBuffer( GL_ARRAY_BUFFER, _meshes[mesh_type + VERTEX_BUFFER] );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _meshes[mesh_type + INDEX_BUFFER] );
+#ifndef ANDROID
+    glBindVertexArrayOES(vao);
+#endif
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+}
+
+void render_draw_custom_quad_vbo(GLuint texture, GLuint vertex_buffer, GLuint index_buffer, float x, float y, float width, float height )
+{
+    float4x4 mWorld = float4x4translation(x, y, 0.0f);
+    float4x4 mScale = float4x4Scale(width, height, 1.0f);
+    mWorld = float4x4multiply(&mScale, &mWorld);
+    
+    glUniformMatrix4fv(_uniforms[UNIFORM_WORLD_MATRIX], 1, 0, (const GLfloat*)&mWorld);
+    glUniformMatrix4fv(_uniforms[UNIFORM_VIEWPROJECTION_MATRIX], 1, 0, (const GLfloat*)&_projectionMatrix[_current_projection]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
     
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(0));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
-#else
-    glBindVertexArrayOES(_meshes[mesh_type]);
-#endif
+    
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 }
+
 void render_resize(float width, float height)
 {
     _projectionMatrix[kOrthographic] = float4x4OrthographicRH(width, height, 0.0f, 1.0f);
