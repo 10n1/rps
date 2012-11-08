@@ -63,7 +63,7 @@ double timer_running_time(Timer* timer) {
 uint64_t rps_get_time( void ) {
     struct timespec now;
     clock_gettime( CLOCK_REALTIME, &now );
-    return ( now.tv_sec + now.tv_nsec );
+    return ( 1e9 * now.tv_sec + now.tv_nsec );
 }
 
 void timer_init(Timer* timer) {
