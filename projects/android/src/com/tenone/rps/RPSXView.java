@@ -14,6 +14,8 @@ import android.os.SystemClock;
 // RPSXView - main view that extends GLSurfaceView
 class RPSXView extends GLSurfaceView
 {
+    private static final String VIEW_TAG = "RPSXView";
+
     private RPSXRenderer m_pRenderer;
 
     public RPSXView( Context context ) 
@@ -23,6 +25,7 @@ class RPSXView extends GLSurfaceView
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion( 2 );
 
+        Log.i(VIEW_TAG, "Create renderer");
         // Set the renderer associated with this view
         m_pRenderer = new RPSXRenderer();
         setRenderer( m_pRenderer );
@@ -41,6 +44,8 @@ class RPSXView extends GLSurfaceView
 
     private static class RPSXRenderer implements GLSurfaceView.Renderer 
     {
+        private static final String RENDERER_TAG = "RPSXRenderer";
+
         private long m_nLastTime;
         private float m_fPreviousX = 0.0f;
         private float m_fPreviousY = 0.0f;
@@ -70,6 +75,7 @@ class RPSXView extends GLSurfaceView
 
         public void onSurfaceChanged( GL10 gl, int width, int height )
         {
+            Log.i(RENDERER_TAG, "Call init");
             RPSXLib.init( width, height );
         }
 

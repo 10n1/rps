@@ -5,6 +5,8 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+extern unsigned int _device_width;
+extern unsigned int _device_height;
 extern AAssetManager* _asset_manager;
 
 /*----------------------------------------------------------------------------*\
@@ -26,6 +28,7 @@ External
 \*----------------------------------------------------------------------------*/
 
 #define  LOG_TAG    "RPSX"
+#define  LOGW(...)  __android_log_write(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 void CNSLog(const char* format, ...)
@@ -40,13 +43,27 @@ void CNSLog(const char* format, ...)
     va_end(args);
 }
 
+void CNSLogWrite( const char* message )
+{
+    LOGW( message );
+}
+
+void* get_asset_manager(void)
+{
+    return _asset_manager;
+}
+
 int system_load_file_to_memory( const char* filename, void** buffer, int* buffer_size )
 {
+    CNSLogWrite( filename );
+ 
     char str[256];
     strncpy( str, filename, 256 );
     char* stripped = strstr( str, "/" );
 
-    AAsset* asset_file = AAssetManager_open( _asset_manager, stripped+1, AASSET_MODE_UNKNOWN );
+    CNSLogWrite( stripped+1 );
+
+    AAsset* asset_file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
     if( asset_file == NULL )
         return 1;
 
@@ -60,16 +77,22 @@ int system_load_file_to_memory( const char* filename, void** buffer, int* buffer
     memcpy( *buffer, data_bytes, data_length );
     *buffer_size = data_length;
 
+    CNSLogWrite( "success" );
+
     return 0;
 }
 
 int system_load_file(const char* filename, void* buffer, int buffer_size)
 {
+    CNSLogWrite( filename );
+
     char str[256];
     strncpy( str, filename, 256 );
     char* stripped = strstr( str, "/" );
 
-    AAsset* asset_file = AAssetManager_open( _asset_manager, stripped+1, AASSET_MODE_UNKNOWN );
+    CNSLogWrite( stripped+1 );
+
+    AAsset* asset_file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
     if( asset_file == NULL )
         return 1;
 
@@ -85,30 +108,22 @@ int system_load_file(const char* filename, void* buffer, int buffer_size)
     memset(buffer, 0, buffer_size);
     memcpy(buffer, data_bytes, data_length);
 
+    CNSLogWrite( "success" );
+
     return 0;
 }
 
 const char* system_get_path(const char* filename)
 {
-    // remove the "assets/" from the filename
-    // by finding the first instance of "/" and
-    // using the rest of the string after that position
-    char str[256];
-    strncpy( str, filename, 256 );
-    char* p = strstr( str, "/" );
-
-    CNSLog( "filename: %s", filename );
-    CNSLog( "stripped filename: %s", p+1 );
-
-    return p+1;
+    return filename;
 }
 
 float get_device_scale(void) {
     return 1.0f;
 }
 float get_device_width(void) {
-    return 0.0f;
+    return (float)_device_width;
 }
 float get_device_height(void) {
-    return 0.0f;
+    return (float)_device_height;
 }

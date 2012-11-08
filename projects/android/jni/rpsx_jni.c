@@ -16,6 +16,8 @@
 #include "game.h"
 
 static game_t _game;
+unsigned int _device_width = 0;
+unsigned int _device_height = 0;
 AAssetManager* _asset_manager = NULL;
 
 // JNI function declarations
@@ -27,6 +29,8 @@ JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_createAssetManager(JNIEnv* en
 
 JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_init(JNIEnv * env, jobject obj,  jint width, jint height)
 {
+	_device_width = width;
+	_device_height = height;
     game_initialize( &_game, width, height );
 }
 
