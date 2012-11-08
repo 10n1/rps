@@ -8,6 +8,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/rps
 LOCAL_SRC_FILES := rpsx_jni.c \
                    rps/stb_image.c \
                    rps/system_android.c \
+                   rps/ui.c \
                    rps/timer.c \
                    rps/render.c \
                    rps/game.c

@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#ifdef ANDROID
+#include <android/asset_manager.h>
+#endif
 #include "render.h"
 #include "system.h"
 
@@ -85,7 +88,6 @@ static GLuint           _font_textures[16] = {0};
 static bmfont_info_t    _font_info = {0};
 static bmfont_common_t  _font_common = {0};
 static bmfont_char_t    _font_chars[256] = {0};
-static GLuint           _char_meshes[256] = {0};
 static int              _char_textures[256] = {0};
 static button_t         _buttons[256] = {0};
 static int              _num_buttons = 0;
@@ -93,9 +95,77 @@ static float            _scale = 0.0f;
 static GLuint           _button_end = 0;
 static GLuint           _button_mid = 0;
 
+#ifdef ANDROID
+static GLuint           _char_meshes[ 256 * NUM_BUFFERS ] = {0};
+#else
+static GLuint           _char_meshes[ 256 ] = {0};
+#endif
+
 static void _load_font(const char* filename) {
     int ii, jj;
     uint8_t header[4];
+#ifdef ANDROID
+    CNSLogWrite( filename );
+ 
+    char str[256];
+    strncpy( str, filename, 256 );
+    char* stripped = strstr( str, "/" );
+
+    CNSLogWrite( stripped+1 );
+
+    AAsset* file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
+    int bytes_read = AAsset_read( file, header, sizeof(header) );
+    if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
+        CNSLogWrite( "Closing file" );
+        AAsset_close(file);
+        return;
+    }
+
+    do {
+        bmfont_block_type_t type;
+        bytes_read = AAsset_read( file, &type, sizeof(type) );
+        switch(type.type) {
+        case kBMFontInfoBlock: {
+                bytes_read = AAsset_read( file, &_font_info, type.size );
+                break;
+            }
+        case kBMFontCommonBlock: {
+                bytes_read = AAsset_read( file, &_font_common, type.size );
+                break;
+            }
+        case kBMFontPagesBlock: {
+                char font_texture[256] = {0};
+                char pagenames[1024] = {0};
+                const char* curr_pagename = pagenames;
+                int ii=0;
+                bytes_read = AAsset_read( file, &pagenames, type.size );
+                while(strlen(curr_pagename))
+                {
+                    sprintf(font_texture, "assets/%s", curr_pagename);
+                    _font_textures[ii++] = render_create_texture(font_texture);
+                    while(*curr_pagename != '\0')
+                        ++curr_pagename;
+                    ++curr_pagename;
+                }
+                break;
+            }
+        case kBMFontCharsBlock: {
+                int ii;
+                int num_chars = type.size/sizeof(bmfont_char_t);
+                for(ii=0; ii<num_chars; ++ii) {
+                    bmfont_char_t character;
+                    bytes_read = AAsset_read( file, &character, sizeof(character) );
+                    _font_chars[character.id] = character;
+                }
+                break;
+            }
+        case kBMFontKerningBlock:
+            break;
+        }
+    } while( bytes_read > 0 );
+    AAsset_close( file );
+
+#else
     FILE* file = fopen(system_get_path(filename), "rb");
     fread(header, sizeof(header), 1, file);
     if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
@@ -146,6 +216,7 @@ static void _load_font(const char* filename) {
         }
     } while(!feof(file) && !ferror(file));
     fclose(file);
+#endif
 
     _scale = 64.0f/_font_common.lineHeight;
     for(ii=0;ii<256;++ii) {
@@ -165,13 +236,21 @@ static void _load_font(const char* filename) {
         GLuint buffers[2] = {0};
         if(_font_chars[ii].id == 0)
             continue;
-        glGenVertexArraysOES(1, &_char_meshes[ii]);
-        glBindVertexArrayOES(_char_meshes[ii]);
-
+        
         for (jj=0; jj<4; ++jj) {
             quad_vertices[jj].tex[0] /= (float)_font_common.scaleW;
             quad_vertices[jj].tex[1] /= (float)_font_common.scaleH;
         }
+        
+#ifdef ANDROID
+        glGenBuffers(2, &_char_meshes[ii] );
+        glBindBuffer(GL_ARRAY_BUFFER, _char_meshes[ ii + VERTEX_BUFFER ]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _char_meshes[ ii + INDEX_BUFFER ]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+#else
+        glGenVertexArraysOES(1, &_char_meshes[ii]);
+        glBindVertexArrayOES(_char_meshes[ii]);
 
         glGenBuffers(2, buffers);
         glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -185,6 +264,7 @@ static void _load_font(const char* filename) {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), BUFFER_OFFSET(12));
 
         glBindVertexArrayOES(0);
+#endif
 
         _char_textures[ii] = _font_textures[c.page];
     }
@@ -197,10 +277,19 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
             return text+1;
         }
         if(c != ' ') {
+#ifdef ANDROID
+            render_draw_custom_quad_vbo(_char_textures[c],
+                                        _char_meshes[c + VERTEX_BUFFER],
+                                        _char_meshes[c + INDEX_BUFFER],
+                                        x+glyph.xoffset*size,
+                                        y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
+                                        size, size);
+#else
             render_draw_custom_quad(_char_textures[c], _char_meshes[c],
                                     x+glyph.xoffset*size,
                                     y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
                                     size, size);
+#endif
         }
         x += glyph.xadvance * size;
         ++text;
@@ -223,7 +312,7 @@ static float _get_text_width(const char* text) {
  */
 void ui_init(void) {
     _load_font("assets/andika.fnt");
-    _button_end = render_create_texture("assets/button_end.png");
+//    _button_end = render_create_texture("assets/button_end.png");
     _button_mid = render_create_texture("assets/white.png");
 }
 void ui_draw_text(const char* text, float x, float y, float size) {

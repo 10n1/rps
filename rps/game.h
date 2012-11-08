@@ -19,7 +19,7 @@
 
 #include "rps_math.h"
 #include "timer.h"
-// #include "ui.h"
+ #include "ui.h"
 
 typedef struct game_t game_t;
 typedef struct player_t player_t;
@@ -62,21 +62,21 @@ struct game_t {
     float           speed;
     player_t        player;
     game_state_t    state;
-    // button_t*       pause_button;
-    // button_t*       resume_button;
-    // button_t*       pause_background;
-    // button_t*       quit_button;
-    // button_t*       weapon_buttons[kNumWeapons];
-    // button_t*       play_button;
+    button_t*       pause_button;
+    button_t*       resume_button;
+    button_t*       pause_background;
+    button_t*       quit_button;
+    button_t*       weapon_buttons[kNumWeapons];
+    button_t*       play_button;
 };
 
 void game_initialize(game_t* game, float width, float height);
 void game_update(game_t* game);
 void game_render(game_t* game);
 void game_shutdown(game_t* game);
-// void game_pause(ui_param_t* p);
-// void game_resume(ui_param_t* p);
-// void game_toggle_pause(ui_param_t* params);
+ void game_pause(ui_param_t* p);
+ void game_resume(ui_param_t* p);
+ void game_toggle_pause(ui_param_t* params);
 
 void game_clear_touch(game_t* game);
 void game_handle_touch(game_t* game, float x, float y);
