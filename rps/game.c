@@ -193,7 +193,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->play_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Play")*1.2f*1.5f, 1.5f*ui_text_size()-8*get_device_scale());
     game->play_button->callback = _game_start;
     game->play_button->params[0].ptr = game;
-    game->play_button->active = 0;
+    game->play_button->active = 0; //1;
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -201,7 +201,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->speed = 1.0f;
 
     render_set_projection_matrix(kOrthographic);
-    
+
     game->state = kGame;
 }
 void game_update(game_t* game) {
