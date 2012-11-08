@@ -62,7 +62,7 @@ double timer_running_time(Timer* timer) {
 
 uint64_t rps_get_time( void ) {
     struct timespec now;
-    clock_gettime( CLOCK_MONOTONIC, &now );
+    clock_gettime( CLOCK_REALTIME, &now );
     return ( 1000 * now.tv_sec + now.tv_nsec / 1e6 );
 }
 
