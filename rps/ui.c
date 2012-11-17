@@ -312,8 +312,11 @@ static float _get_text_width(const char* text) {
  */
 void ui_init(void) {
     _load_font("assets/andika.fnt");
+<<<<<<< HEAD
 //    _button_end = render_create_texture("assets/button_end.png");
     _button_mid = render_create_texture("assets/white.png");
+=======
+>>>>>>> Updated assets, small fix
 }
 void ui_draw_text(const char* text, float x, float y, float size) {
     size *= _scale * get_device_scale()/2;
