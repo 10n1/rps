@@ -55,13 +55,9 @@ void* get_asset_manager(void)
 
 int system_load_file_to_memory( const char* filename, void** buffer, int* buffer_size )
 {
-    CNSLogWrite( filename );
- 
     char str[256];
     strncpy( str, filename, 256 );
     char* stripped = strstr( str, "/" );
-
-    CNSLogWrite( stripped+1 );
 
     AAsset* asset_file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
     if( asset_file == NULL )
@@ -77,20 +73,14 @@ int system_load_file_to_memory( const char* filename, void** buffer, int* buffer
     memcpy( *buffer, data_bytes, data_length );
     *buffer_size = data_length;
 
-    CNSLogWrite( "success" );
-
     return 0;
 }
 
 int system_load_file(const char* filename, void* buffer, int buffer_size)
 {
-    CNSLogWrite( filename );
-
     char str[256];
     strncpy( str, filename, 256 );
     char* stripped = strstr( str, "/" );
-
-    CNSLogWrite( stripped+1 );
 
     AAsset* asset_file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
     if( asset_file == NULL )
@@ -107,8 +97,6 @@ int system_load_file(const char* filename, void* buffer, int buffer_size)
 
     memset(buffer, 0, buffer_size);
     memcpy(buffer, data_bytes, data_length);
-
-    CNSLogWrite( "success" );
 
     return 0;
 }

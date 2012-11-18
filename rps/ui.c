@@ -51,6 +51,50 @@ typedef struct {
     char        name[128];
 } bmfont_info_t;
 
+void bmfont_info_debug( bmfont_info_t* font_info )
+{
+    char buf[256];
+
+    sprintf( buf, "name: %s", font_info->name );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "fontSize: %d", font_info->fontSize );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "bitField: %d", font_info->bitField );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "charSet: %d", font_info->charSet );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "stretchH: %d", font_info->stretchH );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "aa: %d", font_info->aa );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "paddingUp: %d", font_info->paddingUp );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "paddingRight: %d", font_info->paddingRight );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "paddingDown: %d", font_info->paddingDown );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "paddingLeft: %d", font_info->paddingLeft );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "spacingHoriz: %d", font_info->spacingHoriz );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "spacingVert: %d", font_info->spacingVert );
+    CNSLogWrite( buf );
+
+    sprintf( buf, "outline: %d", font_info->outline );
+    CNSLogWrite( buf );
+}
+
 typedef struct {
     uint16_t    lineHeight;
     uint16_t    base;
@@ -124,9 +168,14 @@ static void _load_font(const char* filename) {
     do {
         bmfont_block_type_t type;
         bytes_read = AAsset_read( file, &type, sizeof(type) );
+
+        sprintf( str, "type = { %d, %d }", type.type, type.size );
+        CNSLogWrite( str );
+
         switch(type.type) {
         case kBMFontInfoBlock: {
                 bytes_read = AAsset_read( file, &_font_info, type.size );
+                bmfont_info_debug( &_font_info );
                 break;
             }
         case kBMFontCommonBlock: {
@@ -139,6 +188,7 @@ static void _load_font(const char* filename) {
                 const char* curr_pagename = pagenames;
                 int ii=0;
                 bytes_read = AAsset_read( file, &pagenames, type.size );
+
                 while(strlen(curr_pagename))
                 {
                     sprintf(font_texture, "assets/%s", curr_pagename);
