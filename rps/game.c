@@ -193,7 +193,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->play_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Play")*1.2f*1.5f, 1.5f*ui_text_size()-8*get_device_scale());
     game->play_button->callback = _game_start;
     game->play_button->params[0].ptr = game;
-    game->play_button->active = 0; //1;
+    game->play_button->active = 1;
 
     timer_init(&game->timer);
     srand((int32_t)game->timer.start_time);
@@ -202,7 +202,14 @@ void game_initialize(game_t* game, float width, float height) {
 
     render_set_projection_matrix(kOrthographic);
 
-    game->state = kGame;
+#ifdef ANDROID
+    // NOTE: This should be removed once the buttons work correctly.
+    //       For now this works in order to test that weapon buttons
+    //       render correctly.
+    ui_param_t param;
+    param.ptr = game;
+    _game_start( &param );
+#endif
 }
 void game_update(game_t* game) {
     int ii;
