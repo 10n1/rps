@@ -64,7 +64,7 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
         return -1;
     return result;
 }
- static void _player_selection(ui_param_t* p) {
+static void _player_selection(ui_param_t* p) {
      game_t* game = p[0].ptr;
      weapon_t weapon = p[1].i;
      int ii;
@@ -75,10 +75,9 @@ static int _get_winner(weapon_t player_one, weapon_t player_two) {
              game->weapon_buttons[ii]->color = kWhite;
      }
      game->player.selection = weapon;
- }
+}
 
-
- static void _game_start(ui_param_t* p) {
+static void _game_start(ui_param_t* p) {
      game_t* game = p[0].ptr;
      int ii;
      game->state = kGame;
@@ -191,7 +190,7 @@ void game_initialize(game_t* game, float width, float height) {
     game->quit_button->active = 0;
     
     game->play_button = ui_create_button_texture(_button_texture, 0, 0, ui_text_width("Play")*1.2f*1.5f, 1.5f*ui_text_size()-8*get_device_scale());
-    game->play_button->callback = _game_start;
+    game->play_button->callback = (ui_callback_t*)_game_start;
     game->play_button->params[0].ptr = game;
     game->play_button->active = 1;
 
@@ -208,7 +207,7 @@ void game_initialize(game_t* game, float width, float height) {
     //       render correctly.
     ui_param_t param;
     param.ptr = game;
-    _game_start( &param );
+    // _game_start( &param );
 #endif
 }
 void game_update(game_t* game) {
@@ -298,6 +297,7 @@ void game_handle_touch(game_t* game, float x, float y) {
     int ii;
     x -= get_device_width()/2;
     y = -y + get_device_height()/2;
+
     for(ii=0;ii<kNumWeapons;++ii) {
         float l, r, b, t;
         button_t* button = game->weapon_buttons[ii];
