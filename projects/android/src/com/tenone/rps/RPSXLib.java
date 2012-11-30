@@ -20,5 +20,6 @@ public class RPSXLib
      public static native void init( int width, int height );
      public static native void step( float fElapsedTime );
      public static native void createAssetManager( AssetManager assetManager );
-    
+
+     public static native void handleTouch( float x, float y );
 }

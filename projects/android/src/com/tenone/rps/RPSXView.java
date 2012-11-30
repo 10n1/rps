@@ -66,11 +66,7 @@ class RPSXView extends GLSurfaceView
 
         public void processTouch(float x, float y) 
         {
-            float fCurrentY = y;
-
-            float fDeltaY = fCurrentY - m_fPreviousY;
-
-            m_fPreviousY = fCurrentY;
+            RPSXLib.handleTouch( x, y );
         }
 
         public void onSurfaceChanged( GL10 gl, int width, int height )

@@ -24,6 +24,7 @@ AAssetManager* _asset_manager = NULL;
 JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_init(JNIEnv * env, jobject obj,  jint width, jint height);
 JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_step(JNIEnv * env, jobject obj, jfloat fElapsedTime);
 JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_createAssetManager(JNIEnv* env, jobject obj, jobject assetManager);
+JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_handleTouch(JNIEnv* env, jobject obj, jfloat x, jfloat y);
 
 // JNI function definitions
 
@@ -49,3 +50,7 @@ JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_createAssetManager(JNIEnv* en
     assert( _asset_manager );
 }
 
+JNIEXPORT void JNICALL Java_com_tenone_rps_RPSXLib_handleTouch(JNIEnv* env, jobject obj, jfloat x, jfloat y)
+{
+	game_handle_touch( &_game, x, y );
+}
