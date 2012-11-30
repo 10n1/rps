@@ -51,50 +51,6 @@ typedef struct {
     char        name[128];
 } bmfont_info_t;
 
-void bmfont_info_debug( bmfont_info_t* font_info )
-{
-    char buf[256];
-
-    sprintf( buf, "name: %s", font_info->name );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "fontSize: %d", font_info->fontSize );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "bitField: %d", font_info->bitField );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "charSet: %d", font_info->charSet );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "stretchH: %d", font_info->stretchH );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "aa: %d", font_info->aa );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "paddingUp: %d", font_info->paddingUp );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "paddingRight: %d", font_info->paddingRight );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "paddingDown: %d", font_info->paddingDown );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "paddingLeft: %d", font_info->paddingLeft );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "spacingHoriz: %d", font_info->spacingHoriz );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "spacingVert: %d", font_info->spacingVert );
-    CNSLogWrite( buf );
-
-    sprintf( buf, "outline: %d", font_info->outline );
-    CNSLogWrite( buf );
-}
-
 typedef struct {
     uint16_t    lineHeight;
     uint16_t    base;
@@ -149,16 +105,13 @@ static void _load_font(const char* filename) {
     int ii, jj;
     uint8_t header[4];
 #ifdef ANDROID
-    CNSLogWrite( filename );
- 
     char str[256];
     strncpy( str, filename, 256 );
     char* stripped = strstr( str, "/" );
 
-    CNSLogWrite( stripped+1 );
-
     AAsset* file = AAssetManager_open( get_asset_manager(), stripped+1, AASSET_MODE_UNKNOWN );
     int bytes_read = AAsset_read( file, header, sizeof(header) );
+
     if(header[0] != 'B' || header[1] != 'M' || header[2] != 'F' || header[3] != 3) {
         CNSLogWrite( "Closing file" );
         AAsset_close(file);
@@ -169,13 +122,9 @@ static void _load_font(const char* filename) {
         bmfont_block_type_t type;
         bytes_read = AAsset_read( file, &type, sizeof(type) );
 
-        sprintf( str, "type = { %d, %d }", type.type, type.size );
-        CNSLogWrite( str );
-
         switch(type.type) {
         case kBMFontInfoBlock: {
                 bytes_read = AAsset_read( file, &_font_info, type.size );
-                bmfont_info_debug( &_font_info );
                 break;
             }
         case kBMFontCommonBlock: {
@@ -212,7 +161,7 @@ static void _load_font(const char* filename) {
         case kBMFontKerningBlock:
             break;
         }
-    } while( bytes_read > 0 );
+    } while( bytes_read > 0 && AAsset_getRemainingLength( file ) > 0 );
     AAsset_close( file );
 
 #else
@@ -293,10 +242,11 @@ static void _load_font(const char* filename) {
         }
         
 #ifdef ANDROID
-        glGenBuffers(2, &_char_meshes[ii] );
-        glBindBuffer(GL_ARRAY_BUFFER, _char_meshes[ ii + VERTEX_BUFFER ]);
+        int kk = ii * NUM_BUFFERS;
+        glGenBuffers(2, &_char_meshes[kk] );
+        glBindBuffer(GL_ARRAY_BUFFER, _char_meshes[ kk + VERTEX_BUFFER ]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _char_meshes[ ii + INDEX_BUFFER ]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _char_meshes[ kk + INDEX_BUFFER ]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 #else
         glGenVertexArraysOES(1, &_char_meshes[ii]);
@@ -328,9 +278,11 @@ static const char* _draw_line(const char* text, float x, float y, float size) {
         }
         if(c != ' ') {
 #ifdef ANDROID
+            unsigned int vb_offset = ( ((unsigned int)c) * NUM_BUFFERS ) + VERTEX_BUFFER;
+            unsigned int ib_offset = ( ((unsigned int)c) * NUM_BUFFERS ) + INDEX_BUFFER;
             render_draw_custom_quad_vbo(_char_textures[c],
-                                        _char_meshes[c + VERTEX_BUFFER],
-                                        _char_meshes[c + INDEX_BUFFER],
+                                        _char_meshes[ vb_offset ],
+                                        _char_meshes[ ib_offset ],
                                         x+glyph.xoffset*size,
                                         y-(glyph.height+glyph.yoffset-_font_common.lineHeight)*size,
                                         size, size);
