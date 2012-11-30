@@ -302,11 +302,11 @@ void game_handle_touch(game_t* game, float x, float y) {
         b = button->y - button->height/2;
         t = button->y + button->height/2;
         if(x > l && x <= r && y > b && y <= t) {
-            touch_handled = 1;
             ui_param_t p[2];
             p[0].ptr = game;
             p[1].i = ii;
             _player_selection(p);
+            touch_handled = 1;
         }
     }
 
