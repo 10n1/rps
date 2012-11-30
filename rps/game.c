@@ -200,15 +200,6 @@ void game_initialize(game_t* game, float width, float height) {
     game->speed = 1.0f;
 
     render_set_projection_matrix(kOrthographic);
-
-#ifdef ANDROID
-    // NOTE: This should be removed once the buttons work correctly.
-    //       For now this works in order to test that weapon buttons
-    //       render correctly.
-    ui_param_t param;
-    param.ptr = game;
-    // _game_start( &param );
-#endif
 }
 void game_update(game_t* game) {
     int ii;
@@ -294,7 +285,10 @@ void game_handle_tap(game_t* game, float x, float y) {
 }
 
 void game_handle_touch(game_t* game, float x, float y) {
+    int touch_handled = 0;
     int ii;
+    float x_orig = x;
+    float y_orig = y;
     x -= get_device_width()/2;
     y = -y + get_device_height()/2;
 
@@ -308,12 +302,16 @@ void game_handle_touch(game_t* game, float x, float y) {
         b = button->y - button->height/2;
         t = button->y + button->height/2;
         if(x > l && x <= r && y > b && y <= t) {
+            touch_handled = 1;
             ui_param_t p[2];
             p[0].ptr = game;
             p[1].i = ii;
             _player_selection(p);
         }
     }
+
+    if( !touch_handled )
+      game_handle_tap( game, x_orig, y_orig );
 }
 void game_toggle_pause(ui_param_t* p) {
     game_t* game = p[0].ptr;
