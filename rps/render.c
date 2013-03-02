@@ -63,7 +63,7 @@ static int _validate_program(GLuint program)
 }
 
 
-static GLuint               _character_meshes[256] = {0};
+//static GLuint               _character_meshes[256] = {0};
 static float4x4             _projectionMatrix[kNumProjectionTypes];
 static GLuint               _program = 0;
 static GLint                _uniforms[NUM_UNIFORMS] = {-1};
